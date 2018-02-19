@@ -34,17 +34,11 @@ class Page extends Model
 		$this->isActive(Controller::initPageName());
 		$nav = $this->nav;
 		$title = $this->title;
-		include 'view/view__head.php';
+		include VIEW_DIR_INCLUDE.'head.php';
 	}
-	public function renderBody()
+	public function renderBody($template)
 	{
-		$theme = ['text'=>'семантика'];
-		$num = 5;
-		$quest = 'test';
-		$answers = [
-			['order'=>'1','value'=>1,'text'=>'несколько ручеек языком дороге'],
-			['order'=>'2','value'=>2,'text'=>'семантика путь взобравшись']];
-		$template = Controller::getTemplate();
-		include $template;
+		$template;// = Controller::getTemplate();
+		include VIEW_DIR_PAGE.$template.'.php';
 	}
 }

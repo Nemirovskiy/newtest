@@ -4,11 +4,11 @@ function autoloadClass($className)
 {
 	$found = false;
 	$dirs = [
-		'controller',
-		'model'
+		CLASS_DIR_CONTROLLER,
+		CLASS_DIR_MODEL
 	];
 	foreach ($dirs as $dir) {
-		$fileName = $dir.'/'.$className.'.class.php';
+		$fileName = $dir.$className.'.class.php';
 		if(is_file($fileName)){
 			require_once($fileName);
 			$found = true;

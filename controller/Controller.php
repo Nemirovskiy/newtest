@@ -1,19 +1,18 @@
 <?
+// запускаем сессию
 session_start();
-
-require_once 'controller/autoload.php';
+// подключаем настройки
 require_once 'controller/settings.php';
+// подключаем автозагрузку классов
+require_once 'controller/autoload.php';
 
-// метод получения названий страниц
-// метод получения тем тестов
 
+// метод определения адрес - шаблон или тема теста
+$url = Controller::urlDetecter();
+print_r($url);
+// создаем объект страницу или тест
+$page = new $url[0];
 
-//echo Controller::getTemplate();
-
-$page = new Page;
+// передаем данные представлению
 $page->renderHead();
-$page->renderBody();
-
-//$page->renderHead() = Controller::initPageName();
-// вызываем метод определения какую страницу отображать
-// 
+$page->renderBody($url[1]);

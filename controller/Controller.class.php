@@ -17,11 +17,21 @@ class Controller
 	public static function getTemplate()
 	 {
 	 	$name = !empty($_GET['t']) ? strip_tags($_GET['t']) : 'index';
-	 	// сделать и вынести в конфиг константы для папки представления
-	 	if(is_file('view/view_'.$name.'.php'))
-	 		return 'view/view_'.$name.'.php';
-	 	else return 'view/view_test.php';
-	 } 
+	 	if(is_file(VIEW_DIR_PAGE.$name.'.php'))
+	 		return VIEW_DIR_PAGE.$name.'.php';
+	 	else return VIEW_DIR_TEST.'test.php';
+	 }
+	 // метод определяет по адресу страница или тест
+	public static function urlDetecter()
+	 {
+	    // забираем параметр из строки адреса, если пусто - главная
+	 	$name = !empty($_GET['t']) ? strip_tags($_GET['t']) : 'index';
+         // если есть файл шаблна - это статичная стрница
+	 	if(is_file(VIEW_DIR_PAGE.$name.'.php'))
+	 		return ['Page',$name];
+	 	// иначе - это тест
+	 	else return ['Test',$name];
+	 }
 
 	//
 	static function render()
