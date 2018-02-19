@@ -22,7 +22,10 @@ class Page extends Model
         if(self::$list === null){
             // получаем список страниц из БД
             $arr = [
-                ['code' => '',		'menu'=> 1,'title'=>'Главная'],
+                // code - символьный код страницы
+                // menu - отображение в меню
+                // title - заголовок страницы
+                ['code' => 'index',	'menu'=> 1,'title'=>'Главная'],
                 ['code' => 'ser',	'menu'=> 1,'title'=>'СанЭпидРежим'],
                 ['code' => 'feld',	'menu'=> 1,'title'=>'Фельдшеры'],
                 ['code' => 'smp',	'menu'=> 1,'title'=>'Скорая помощь'],
@@ -37,8 +40,7 @@ class Page extends Model
 	{
 	    // получаем список страниц
 		$pages = self::getList();
-		// указываем символьный код текущей старницы- если главная - то пусто
-        $code = ($this->code != 'index')? $this->code :'';
+		$code = $this->code;
 		$nav = [];
 		$flag = false;
 		foreach ($pages as $key => $value) {
@@ -47,6 +49,8 @@ class Page extends Model
 		        if($value['code'] == $code){
                      $nav[$key]['active'] = $flag= true;
                 }
+                // если код текущей старницы index - ссылка будет без кода 
+                if($nav[$key]['code'] == 'index') $nav[$key]['code']='';
             }
 		}
         $this->nav = $nav;
