@@ -8,3 +8,8 @@ define('VIEW_DIR_ERORS', 'view/errors/');
 /// пути классов
 define('CLASS_DIR_CONTROLLER', 'controller/');
 define('CLASS_DIR_MODEL', 'model/');
+
+// настройка доступа к БД
+define('BD_NAME', 'feldtest');
+define('BD_LOGIN', 'root');
+define('BD_PASS', '');
