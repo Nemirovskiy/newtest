@@ -21,16 +21,7 @@ class Page extends Model
     {
         if(self::$list === null){
             // получаем список страниц из БД
-            $arr = [
-                // code - символьный код страницы
-                // menu - отображение в меню
-                // title - заголовок страницы
-                ['code' => 'index',	'menu'=> 1,'title'=>'Главная'],
-                ['code' => 'ser',	'menu'=> 1,'title'=>'СанЭпидРежим'],
-                ['code' => 'feld',	'menu'=> 1,'title'=>'Фельдшеры'],
-                ['code' => 'smp',	'menu'=> 1,'title'=>'Скорая помощь'],
-                ['code' => 'help',	'menu'=> 1,'title'=>'Инструкция']
-            ];
+            $arr = self::select("SELECT * FROM page ORDER BY menu");
             self::$list = $arr;
         }
         return self::$list;
@@ -44,12 +35,12 @@ class Page extends Model
 		$nav = [];
 		$flag = false;
 		foreach ($pages as $key => $value) {
-		    if($value['menu'] === 1) {
+		    if($value['menu'] > 0) {
 		        $nav[$key] = $value;
 		        if($value['code'] == $code){
                      $nav[$key]['active'] = $flag= true;
                 }
-                // если код текущей старницы index - ссылка будет без кода 
+                // если код текущей старницы index - ссылка будет без кода
                 if($nav[$key]['code'] == 'index') $nav[$key]['code']='';
             }
 		}
