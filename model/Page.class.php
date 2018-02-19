@@ -14,33 +14,38 @@ class Page extends Model
 {
 	protected $title='Тестирование - Главная'; // заголовок
 	private $nav=[];	 // навигация
-	private $name='';	 // символьное имя
-	private $list=[];	 // список всех страниц
+	private $code='';	 // символьное имя - код страницы
+    private static $list= null;	 // список всех страниц
 
-	public function setList()
-	{
-	    // получаем список страниц из БД
-		$arr = [
-		    ['name' => '',		'menu'=> 1,'title'=>'Главная'],
-            ['name' => 'ser',	'menu'=> 1,'title'=>'СанЭпидРежим'],
-            ['name' => 'feld',	'menu'=> 1,'title'=>'Фельдшеры'],
-            ['name' => 'smp',	'menu'=> 1,'title'=>'Скорая помощь'],
-            ['name' => 'help',	'menu'=> 1,'title'=>'Инструкция']
-        ];
-        $this->list = $arr;
-	}
+    private static function getList()
+    {
+        if(self::$list === null){
+            // получаем список страниц из БД
+            $arr = [
+                ['code' => '',		'menu'=> 1,'title'=>'Главная'],
+                ['code' => 'ser',	'menu'=> 1,'title'=>'СанЭпидРежим'],
+                ['code' => 'feld',	'menu'=> 1,'title'=>'Фельдшеры'],
+                ['code' => 'smp',	'menu'=> 1,'title'=>'Скорая помощь'],
+                ['code' => 'help',	'menu'=> 1,'title'=>'Инструкция']
+            ];
+            self::$list = $arr;
+        }
+        return self::$list;
+    }
 	// метод формирования меню
 	private function setMenu()
 	{
 	    // получаем список страниц
-		$pages = $this->list;
-        $name = $this->name;
+		$pages = self::getList();
+		// указываем символьный код текущей старницы- если главная - то пусто
+        $code = ($this->code != 'index')? $this->code :'';
 		$nav = [];
+		$flag = false;
 		foreach ($pages as $key => $value) {
 		    if($value['menu'] === 1) {
 		        $nav[$key] = $value;
-		        if($value['name'] == $name){
-                    $nav[$key]['active'] = true;
+		        if($value['code'] == $code){
+                     $nav[$key]['active'] = $flag= true;
                 }
             }
 		}
@@ -50,37 +55,53 @@ class Page extends Model
 	private function setTitle()
 	{
 	    // получаем список страниц
-		$pages = $this->list;
-		$name = $this->name;
-		//echo "<b>$name</b><br>";
+		$pages = self::getList();
+		$code = $this->code;
 		foreach ($pages as $item){
-		   // echo $item['name'].' - '.$item['title'].'<br>';
-		    if($item['name'] == $name){
+		    if($item['code'] == $code){
                 $this->title = $item['title'];
 		        return;
             }
         }
 	}
-    protected function prepareHead($name)
+	private function validAdress($code){
+        foreach (self::getList() as $page){
+            if($code == $page['code'] || $code == 'index'){
+                return true;
+            }
+        }
+        header("HTTP/1.0 404 Not Found");
+        $this->title = "Нет такой страницы";
+        return false;
+    }
+    protected function prepareHead($code)
 	{
-	    $this->name = $name;
-	    $this->setList();
+        $this->code = $code;
         $this->setMenu();
         $this->setTitle();
-		$nav = $this->nav;
-		$title = $this->title;
-		include VIEW_DIR_INCLUDE.'head.php';
+        $nav = $this->nav;
+        $title = $this->title;
+        include VIEW_DIR_INCLUDE.'head.php';
 	}
     protected function prepareBody($template)
 	{
-		include VIEW_DIR_PAGE.$template.'.php';
+		    include VIEW_DIR_PAGE.$template.'.php';
 	}
-	public function renderHtml($name)
+	public function renderHtml($code)
 	{
-	    $this->prepareHead($name);
-        //include VIEW_DIR_INCLUDE.'head.php';
-        $this->prepareBody($name);
+	    // проверяем на корректность адрес
+	    $valid = $this->validAdress($code);
+	    // подготавливаем голову
+        $this->prepareHead($code);
+        // если адрес корректный - подготовим контент
+        if($valid){
+            $this->prepareBody($code);
+        }
+        // иначе - отобразим старницу ошибки
+        else {
+            include VIEW_DIR_ERORS.'404.php';
+        }
+        // подключим низ страницы
         include VIEW_DIR_INCLUDE.'footer.php';
 	}
-
 }
