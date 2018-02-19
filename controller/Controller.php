@@ -9,10 +9,9 @@ require_once 'controller/autoload.php';
 
 // метод определения адрес - шаблон или тема теста
 $url = Controller::urlDetecter();
-print_r($url);
+//print_r($url);
 // создаем объект страницу или тест
 $page = new $url[0];
 
 // передаем данные представлению
-$page->renderHead();
-$page->renderBody($url[1]);
+$page->renderHtml($url[1]);

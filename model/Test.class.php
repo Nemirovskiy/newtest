@@ -9,10 +9,11 @@ class Test extends Page
 	public static $quest=''; 	// Текст вопроса
 	public static $answers=[]; 	// ответы
 
-    public function renderBody($testTheme)
+    protected function prepareBody($testTheme)
     {
         // переместить запрос к БД в класс test
-        $theme = ['text'=>$testTheme];
+        $theme = $this->title;
+        $theme = ['text'=>$theme];
         $num = 5;
         $quest = 'test';
         $answers = [

@@ -11,7 +11,7 @@
 	<header>
 		<nav>
 		<? foreach($nav as $link):?>
-			<a <?if($link['active']) echo 'class="active"';?> href="?t=<?=$link['name']?>"><?=$link['text']?></a>
+			<a <?if($link['active']) echo 'class="active"';?> href="?t=<?=$link['name']?>"><?=$link['title']?></a>
 		<?endforeach;?>
 		</nav>
 	</header>

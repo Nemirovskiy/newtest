@@ -1,44 +1,86 @@
 <?
 /**
-*	
+* модель страницы
+ * - заголовок
+ * - символьное имя - адрес
+ * - меню
+ * - контент
+ * + метод получения данных
+ * + метод подготовки заголовка
+ * + метод подготовки основного контента
+ * + метод формирования страницы
 */
 class Page extends Model
 {
-	private $title='Тестирование'; // заголовок
+	protected $title='Тестирование - Главная'; // заголовок
 	private $nav=[];	 // навигация
-	private $name='';	 // имя
+	private $name='';	 // символьное имя
+	private $list=[];	 // список всех страниц
 
-	public function getList()
+	public function setList()
 	{
-		$arr = parent::getList();
-		array_unshift($arr,['name' => '','text'=>'Главная'/*,'active' => true*/ ]);
-		$this->nav = $arr;
+	    // получаем список страниц из БД
+		$arr = [
+		    ['name' => '',		'menu'=> 1,'title'=>'Главная'],
+            ['name' => 'ser',	'menu'=> 1,'title'=>'СанЭпидРежим'],
+            ['name' => 'feld',	'menu'=> 1,'title'=>'Фельдшеры'],
+            ['name' => 'smp',	'menu'=> 1,'title'=>'Скорая помощь'],
+            ['name' => 'help',	'menu'=> 1,'title'=>'Инструкция']
+        ];
+        $this->list = $arr;
 	}
-	private function isActive($name)
+	// метод формирования меню
+	private function setMenu()
 	{
-		$this->name = $name;
-		$nav = $this->nav;
-		$flag = false;
-		foreach ($nav as $key => $value) {
-			if($value['name'] == $name){
-				$nav[$key]['active'] = true;
-				$this->nav = $nav;
-				$this->title .= ' - '.$value['text'];
-				return;
-			}
+	    // получаем список страниц
+		$pages = $this->list;
+        $name = $this->name;
+		$nav = [];
+		foreach ($pages as $key => $value) {
+		    if($value['menu'] === 1) {
+		        $nav[$key] = $value;
+		        if($value['name'] == $name){
+                    $nav[$key]['active'] = true;
+                }
+            }
 		}
+        $this->nav = $nav;
 	}
-	public function renderHead()
+	// метод возвращения заголовка
+	private function setTitle()
 	{
-		$this->getList();
-		$this->isActive(Controller::initPageName());
+	    // получаем список страниц
+		$pages = $this->list;
+		$name = $this->name;
+		//echo "<b>$name</b><br>";
+		foreach ($pages as $item){
+		   // echo $item['name'].' - '.$item['title'].'<br>';
+		    if($item['name'] == $name){
+                $this->title = $item['title'];
+		        return;
+            }
+        }
+	}
+    protected function prepareHead($name)
+	{
+	    $this->name = $name;
+	    $this->setList();
+        $this->setMenu();
+        $this->setTitle();
 		$nav = $this->nav;
 		$title = $this->title;
 		include VIEW_DIR_INCLUDE.'head.php';
 	}
-	public function renderBody($template)
+    protected function prepareBody($template)
 	{
-		$template;// = Controller::getTemplate();
 		include VIEW_DIR_PAGE.$template.'.php';
 	}
+	public function renderHtml($name)
+	{
+	    $this->prepareHead($name);
+        //include VIEW_DIR_INCLUDE.'head.php';
+        $this->prepareBody($name);
+        include VIEW_DIR_INCLUDE.'footer.php';
+	}
+
 }
