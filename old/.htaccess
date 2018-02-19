@@ -1,0 +1,17 @@
+#кодировка сайта
+RewriteEngine On
+RewriteRule ^post$ post.php [L]
+RewriteRule ^([a-z]+)$ test.php?t=$1 [L]
+ 
+#RemoveHandler .css
+#AddType application/x-httpd-php .php .css
+
+ErrorDocument 401 /error.php 
+ErrorDocument 403 /error.php 
+ErrorDocument 404 /error.php 
+ErrorDocument 500 /error.php
+
+#кодировка загружаемых файлов
+#CharsetSourceEnc UTF-8
+php_value default_charset utf-8
+AddType 'text/html; charset=utf-8' .html .htm .shtml

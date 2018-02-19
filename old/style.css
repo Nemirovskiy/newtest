@@ -1,0 +1,132 @@
+﻿    h1 {margin: 0;}
+    li {list-style: none;}
+    a { display: inline-block;}
+input.inpt {
+    height: 21px;
+    top: -5px;
+    position: relative;
+    width: 26px;
+}
+    input[type="checkbox"]:checked + p {
+	    padding: 5px;
+	    border-radius: 5px;}
+    input[type="checkbox"] + p {
+	    padding: 5px;
+	    border-radius: 5px;}    
+    li { padding: 5px;margin: 5px 0px; display: table;position: relative;}
+    .r_otv {
+	    font-weight: bolder;
+	    border: 2px solid #0c0;    margin-left: 20px;
+	}
+    .m_otv {color: red;    margin-left: 20px;}
+    .r_otv.m_otv {color: #0c0;}
+	.b_otv {color: red;}
+	.m_otv::after {
+    content: "✘";
+    position: absolute;
+    left: -25px;
+    top: 2px;
+    color: #c00;
+}
+	.r_otv::after {
+    content: "✔";
+    position: absolute;
+    left: -25px;
+    top: 2px;
+    color: #0c0;
+}
+	.act {    border: 1px solid;    padding: 3px;}
+	body {    min-width: 200px;
+	    margin: 30px auto;
+	    font-size: 20px;
+	    max-width: 600px;
+	    padding: 10px;position: relative;}
+	ul {    padding: 0;}
+	input[type="checkbox"] {    float: left;}
+	label p {
+	    margin: 0;
+	    padding: 0;
+	    margin-left: 30px;
+	    margin-top: -10px;
+}
+
+nav {width: 100%;text-align: center;}
+
+.btn_rdn {
+cursor: pointer; 
+    display: block;
+    border: 1px solid #d0d2b3;
+    width: 90px;
+    padding: 4px;
+    border-radius: 50px;
+    box-shadow: 2px 1px 9px 2px #efefef;
+}
+
+span.btn_rdn .noactive {
+padding: 2px;
+    font-weight: bold;
+    border: 2px solid #dada84;
+    border-radius: 5px;
+    width: 15px;
+    display: block;
+    height: 15px;
+    border-radius: 23px;
+    background: #ee0;
+}
+
+span.btn_rdn .active {
+    padding: 2px;
+    font-weight: bold;
+    border: 2px solid #0e0eda;
+    border-radius: 5px;
+    width: 15px;
+    display: block;
+    height: 15px;
+    border-radius: 23px;
+    background: #213fe2;
+    left: 65px; 
+    position: relative;
+}
+
+span.btn_rdn .active::after {
+    content: 'Вкл';
+    position: relative;
+	left: -55PX;
+	top: -5px;
+}
+
+span.btn_rdn .noactive::after {
+    content: 'Откл';
+    position: relative;
+	left: 25PX;
+	top: -5px;
+}
+
+
+ul.sett {
+	width: 95%;
+    text-align: center;
+    margin: auto;
+}
+ul.sett li {
+    display: inline-block;
+    text-align: center;
+    align-items: center;
+}
+ul.sett li label {
+    display: inline-block;
+}							  
+div#info {
+    position: absolute;
+    background: rgba(204, 204, 204, 0.90);
+    left: 10%;
+    right: 10%;
+    text-align: center;
+    top: 1px;
+    bottom: 1px;
+    z-index: 99;
+}
+
+.cntr {
+    text-align: center;
+}
