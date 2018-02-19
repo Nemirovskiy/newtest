@@ -1,0 +1,6 @@
+    input[type="checkbox"]:checked + p {
+	    background: #ccc;
+	    color: #fff;}
+    input[type="checkbox"] + p {
+	    background: #fff;
+	    color: #000;}

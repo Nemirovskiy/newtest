@@ -1,0 +1,7 @@
+* {background: #000; color: #fff;}
+input[type="checkbox"]:checked + p {
+	border: 2px solid blue;
+	color: blue;
+	font-weight: bold;}
+input[type="checkbox"] + p {
+	    color: #fff;}
