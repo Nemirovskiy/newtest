@@ -21,7 +21,7 @@ class Page extends Model
     {
         if(self::$list === null){
             // получаем список страниц из БД
-            $arr = self::select("SELECT * FROM page ORDER BY menu");
+            $arr = DBase::select("SELECT * FROM page ORDER BY menu");
             self::$list = $arr;
         }
         return self::$list;
