@@ -1,5 +1,5 @@
-<h1>Вопросы по теме <?=$theme['text']?></h1>
-<form action="post" id="main" method="post">
+<h1>Вопросы по теме <?=$theme?></h1>
+<form action="" id="main" method="post">
     <h2>Вопрос № <?=$num?></h2>
     <h3><?=$quest?></h3>
     <ul>
@@ -7,22 +7,20 @@
     	<li>
     		<label>
 	    		<input class="inpt"
-	    			name="answer_<?=$theme['name']?>_<?=$answer['order']?>"
+	    			name="<?=$code?>[]"
 	    			type='checkbox'
-	    			value="<?=$answer['value']?>">
+	    			value="<?=$answer['order']?>">
 	    		<p><?=$answer['text']?></p>
     		</label>
 		</li>
 		<? endforeach; ?>
 	</ul>
 	<div class='cntr'>
-		<input type="hidden" name="t" value="<? echo $_GET['t'];?>">
     	<input id='submit' disabled type='submit' value='Ok' style="padding: 10px 100px;">
     </div>
 </form>
 <div class='cntr'><br>
     <form action="post" method="post">
-        <input type="hidden" name="t" value="<? echo $_GET['t'];?>">
         <input type="submit" name="reset" value="Сброс">
     </form>
     <br>
