@@ -14,8 +14,10 @@ class Controller
 	 {
 	    // забираем параметр из строки адреса, если пусто - главная
 	 	$name = !empty($_GET['t']) ? strip_tags($_GET['t']) : 'index';
+         if(is_file(VIEW_DIR_ADMIN.$name.'.php'))
+             return ['Admin',$name];
          // если есть файл шаблна - это статичная стрница
-	 	if(is_file(VIEW_DIR_PAGE.$name.'.php'))
+	 	elseif(is_file(VIEW_DIR_PAGE.$name.'.php'))
 	 		return ['Page',$name];
 	 	// иначе - это тест
 	 	else return ['Test',$name];
