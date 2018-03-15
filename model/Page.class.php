@@ -59,7 +59,7 @@ class Page extends Model
             }
         }
 	}
-	private function validAdress($code){
+	protected function validAdress($code){
         foreach (self::getList() as $page){
             if($code == $page['code'] || $code == 'index'){
                 return true;
@@ -78,6 +78,11 @@ class Page extends Model
         $title = $this->title;
         include VIEW_DIR_INCLUDE.'head.php';
 	}
+
+    /**
+     * Функция подготовки основной части страницы
+     * @param string $template - название шаблона
+     */
     protected function prepareBody($template)
 	{
 		    include VIEW_DIR_PAGE.$template.'.php';
