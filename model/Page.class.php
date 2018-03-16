@@ -15,27 +15,25 @@ class Page extends Model
 	protected $title='Тестирование - Главная'; // заголовок
 	private $nav=[];	 // навигация
 	private $code='';	 // символьное имя - код страницы
-    private static $list= null;	 // список всех страниц
+    private $list= null;	 // список всех страниц
 
-    private static function getList()
+    protected function getList($menu = "menu")
     {
-        if(self::$list === null){
+        if($this->list === null){
             // получаем список страниц из БД
-            $arr = DBase::select("SELECT * FROM page ORDER BY menu");
-            self::$list = $arr;
-        }
-        return self::$list;
+            $arr = DBase::select("SELECT * FROM page ORDER BY $menu");
+            $this->list = $arr;}
+        return $this->list;
     }
 	// метод формирования меню
-	private function setMenu()
+	protected function setMenu($menu = "menu")
 	{
 	    // получаем список страниц
-		$pages = self::getList();
+		$pages = $this->getList();
 		$code = $this->code;
 		$nav = [];
-		$flag = false;
 		foreach ($pages as $key => $value) {
-		    if($value['menu'] > 0) {
+		    if($value[$menu] > 0) {
 		        $nav[$key] = $value;
 		        if($value['code'] == $code){
                      $nav[$key]['active'] = $flag= true;
@@ -45,6 +43,7 @@ class Page extends Model
             }
 		}
         $this->nav = $nav;
+		return $nav;
 	}
 	// метод возвращения заголовка
 	private function setTitle()
@@ -72,9 +71,8 @@ class Page extends Model
     protected function prepareHead($code)
 	{
         $this->code = $code;
-        $this->setMenu();
         $this->setTitle();
-        $nav = $this->nav;
+        $nav = $this->setMenu();
         $title = $this->title;
         include VIEW_DIR_INCLUDE.'head.php';
 	}
