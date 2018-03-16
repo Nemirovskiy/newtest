@@ -9,6 +9,10 @@ class Test extends Page
 	public static $quest=''; 	// Текст вопроса
 	public static $answers=[]; 	// ответы
 
+    /**
+     * Метод подготовки основгой части страницы
+     * @param string $testTheme - тема теста
+     */
     protected function prepareBody($testTheme)
     {
         $number = 2; // будем получать из метода генерации номера
@@ -30,8 +34,15 @@ class Test extends Page
         }
         include VIEW_DIR_TEST.'footer.php';
     }
+
+    /**
+     * Метод получения вопроса и ответа из указанной темы и указанного номера вопроса
+     * @param $theme
+     * @param $number
+     * @param bool $rnd
+     * @return array|bool
+     */
     protected function getTest($theme,$number,$rnd = false){
-        // метод получения вопроса и ответа из указанной темы и указанного номера вопроса
         $query = "SELECT * from quest INNER JOIN theme ON (quest.theme_code = theme.theme_code)
                   INNER JOIN answ ON (quest.quest_id = answ.quest_id) WHERE theme.theme_code = ? AND quest_number = ?";
         $tests = DBase::select($query,[$theme,$number]);
@@ -49,5 +60,9 @@ class Test extends Page
         }
         if($rnd) shuffle($result['answers']);
         return $result;
+    }
+
+    function getThemeList(){
+        return $tests = DBase::select("SELECT * FROM theme ");
     }
 }
