@@ -12,8 +12,9 @@ class Admin extends Page
      * @var string $regexRight - регулярное выражение для поиска правильного ответа
      */
     protected static $regexQuest = "#^[\s|\t]*[\#|№]+[\s|\t]*([0-9]*)(.*)$#u";
-    protected static $regexAnsv = "#([а-яА-ЯёЁ\s]+)\)(.+)#u";
-    protected static $regexRight = "#([0-9]+)[\s\t]*([[а-яА-Яa-zA-Z|,\s]{1,10})$#u";
+    protected static $regexAnsv = "#^[\s|\t]*([a-zA-Zа-яА-ЯёЁ\s]+)\)(.+)#u";
+    protected static $regexRight = "#^[\s|\t]*([0-9]+)[\s\t]*([а-яА-Яa-zA-Z|,\s]{1,10})$#u";
+    protected static $errors = '';
     /**
      * функция преобразования букв в порядковые номера
      * @param string $liter - входящий символ или строка
@@ -40,26 +41,47 @@ class Admin extends Page
         /**
          * @var array $quests - возвращаемый массив вопросов
          * @var int $quests_num -  номер текущего вопроса
+         * @var array $prevQ - массав с предыдущими номерами вопросов, для подсчета правильных ответов
+         * @var int $countQuest - количество загруженных вопросов
+         * @var int $countAnswer - количество ответов (мин 1 на вопрос)
+         * @var int $countRight - количество правильных ответов (мин 1 на вопрос)
+         * @var array $diffAnswer - кол-во несоответствий верных ответов (верный ответ больше кол-ва ответов)
+         *
          */
+
         $quests_num = '';
         $quests =[];
         $countQuest = 0;
         $countRight = 0;
+        $countAnswer = 0;
+        $prevQ = [];
+        $prevQW = 0;
+        $diffAnswer = [];
         foreach($arrayStr as $string){
             if (preg_match(self::$regexQuest, $string, $q)) //чтение вопроса
             {
                 $quests_num = (int)$q[1];
                 // очищаем от лишних символов и убираем перевод строк
-                $quests[$quests_num]['quest'] = str_replace(["\n","\r"],"",trim($q[2],"\x00..\x2F \x3A..\x3B"));
+                $quests[$quests_num]['quest'] = str_replace(
+                    ["\n","\r"],"",trim($q[2],"\x00..\x2F \x3A..\x3B")
+                );
                 $quests[$quests_num]['number'] = $quests_num;
+                $countQuest++;
             }
             elseif (preg_match(self::$regexAnsv, $string, $a)) //чтение вариантов ответа
             {
                 $order = self::literToNum($a[1]);
-                $text = trim($a[2],".:;\s\t ");
-                $quests[$quests_num]['answers'][$order] = ['order' => $order, 'right'=>0,
+                //$text = trim($a[2],".:;\s\t ");
+                $quests[$quests_num]['answers'][$order] = [
+                    'order' => $order,
+                    'right' => 0,
                     // очищаем от лишних символов и убираем перевод строк
-                    'text'=>str_replace(["\n","\r"],"",trim($a[2],"\x00..\x20 \x3A..\x3B"))];
+                    'text' => str_replace(["\n","\r"],"",trim($a[2],"\x00..\x20 \x3A..\x3B"))
+                ];
+                if($prevQW !== $quests_num){
+                    $prevQW = $quests_num;
+                    $countAnswer++;
+                }
             }
             if (preg_match(self::$regexRight, $string, $a)) //чтение правильного ответа
             {
@@ -71,16 +93,47 @@ class Admin extends Page
                         // если ответы написаны слитно
                         if(strlen($right) >1) {
                             for($i = 0;$i<strlen($right);$i++){
-                                //echo $a[1]. " - " .$right[$i]."<br>";
+                                if(!isset($quests[$a[1]]['answers'][$right[$i]])) $diffAnswer++;
                                 $quests[$a[1]]['answers'][$right[$i]]['right'] = 1;
+                                if(!in_array($a[1],$prevQ)){
+                                    $prevQ[] = $a[1];
+                                    $countRight++;
+                                }
                             }
                         }
                         else {
-                            $quests[$a[1]]['answers'][$right]['right'] = 1;
+                            if(!isset($quests[$a[1]]['answers'][$right])){
+                                $diffAnswer[] = $a[1];
+                            }
+                            else{
+                                $quests[$a[1]]['answers'][$right]['right'] = 1;
+                            }
+                            if(!in_array($a[1],$prevQ)){
+                                $prevQ[] = $a[1];
+                                $countRight++;
+                            }
                         }
                     }
                 }
             }
+        }
+        /**
+         * проверка подсчета кол-ва вопросов - ответов - верных ответов
+         */
+        if($countQuest !== $countAnswer){
+            self::$errors .= "Количество вопросов не соответствует ответам "
+                ."(на каждый вопрос должен быть хотябы один ответ)";
+        }
+        if($countAnswer !== $countRight){
+            if(strlen(self::$errors)>0) self::$errors .="<br>";
+            self::$errors .= "Количество правильных ответов не соответствует ".
+                "количеству ответов (должен быть хотя бы один верный ответ)";
+        }
+        if(count($diffAnswer)>0){
+            if(strlen(self::$errors)>0) self::$errors .="<br>";
+            self::$errors .= "Указанный верный ответ в вопросе ".
+                implode($diffAnswer," ") ." не соответствует ".
+                "количеству ответов (должен быть не больше, чем вариантов ответа)";
         }
         return $quests;
     }
@@ -112,6 +165,11 @@ class Admin extends Page
      * @param string $template
      * @var array $arrayTests
      */
+    protected function prepareHead($code){
+        parent::prepareHead($code);
+        $nav = $this->setMenu("admin_menu");
+        include VIEW_DIR_INCLUDE.'nav.php';
+    }
     protected function prepareBody($template)
 	{
         /**
@@ -119,20 +177,38 @@ class Admin extends Page
          *
          * @var array $arrayTests
          */
+        $test = new Test();
+        $theme = $test->getThemeList();
+        //print_r($theme);
 	    if(empty($this->prepareQuests())){
             include VIEW_DIR_ADMIN.$template.'.php';
         }
         else{
             // вывод на страницу результат
-            $arrayTests = $this->convertQuests($this->prepareQuests());
-            foreach ($arrayTests as $arr){
-                $theme = $arr['theme'];
-                $code = 'Theme';
-                $num = $arr['number'];
-                $quest = $arr['quest'];
-                $answers = $arr['answers'];
-                include VIEW_DIR_ADMIN.'test_preview.php';
-            }
+            $tests = $this->convertQuests(
+                $this->prepareQuests()
+            );
+            $_SESSION['tests'] = $tests;
+            echo "<pre>";
+            //print_r($tests);
+            echo "</pre>";
+            $theme['code'] = empty($_POST['newCode'])?$_POST['code']:$_POST['newCode'];
+            $theme['name'] = empty($_POST['newName'])?$_POST['name']:$_POST['newName'];
+            $errors = self::$errors;
+//            foreach ($arrayTests as $arr){
+//                $theme = $arr['theme'];
+//                $code = 'Theme';
+//                $num = $arr['number'];
+//                $quest = $arr['quest'];
+//                $answers = $arr['answers'];
+                include VIEW_DIR_ADMIN.'addtest_preview.php';
+//            }
+        }
+
+        if(isset($_POST['submit'])) {
+	        echo "<pre>";
+	        print_r($_SESSION['tests']);
+	        echo "</pre>";
         }
 	}
 
