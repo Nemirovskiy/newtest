@@ -15,11 +15,9 @@
                 foreach ($theme as $item):
             ?>
                     <label>
-                        <input type="radio" name="code" value="<?=$item['theme_code']?>">
+                        <input type="radio" name="code" value="<?=$item['theme_code']?>@<?=$item['theme_text']?>">
                         <?=$item['theme_code']?> - <?=$item['theme_text']?>
-                        <input type="hidden" name="name" value="<?=$item['theme_text']?>">
                     </label><br>
-
             <?
                 endforeach;
             ?>
