@@ -6,7 +6,9 @@
 <?endif;?>
 <ul>
     <?foreach ($tests as $quest):?>
-    <li class="quest"><b class="quest-number">№ <?=$quest['number']?></b> <span class="quest-text"><?=$quest['quest']?></span></li>
+    <li class="quest">
+        <b class="quest-number">№ <?=$quest['number']?></b>
+        <span class="quest-text"><?=$quest['quest']?></span></li>
         <? foreach($quest['answers'] as $answer): ?>
         <li class="<?if($answer['right']) echo "r_otv"?>" >
             <?=$answer['text']?>
