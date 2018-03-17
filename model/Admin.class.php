@@ -145,17 +145,12 @@ class Admin extends Page
      */
     protected function prepareQuests(){
         $test = null;
-        if(!empty($_FILES['file']['tmp_name']))
+        if(!empty($_FILES['file']['tmp_name']) || $_FILES['file']['type'] == "text/plain"){
             $test = file($_FILES['file']['tmp_name']);
-            // проверка кодировки и преобразование
-            //mb_detect_order("CP1251,ASCI,UTF-7,UTF-8");
-            //print_r($test);
-            //$test2 = array_map('mb_convert_encoding',$test,
-                    //array_fill(0,count($test)-1,'UTF-8')/*,
-                    //array_fill(0,count($test)-1,"auto")*/);
-            //echo "<hr>".$test[0].$text[1].$test[2]."<br>";
-            //echo mb_detect_encoding($test[0].$text[1].$test[2])."<br>";
-            //print_r($test2);
+
+        }
+
+
         if(!empty($_POST['text']))
             $test = explode("\n",$_POST['text']);
         return $test;
@@ -192,8 +187,9 @@ class Admin extends Page
             echo "<pre>";
             //print_r($tests);
             echo "</pre>";
-            $theme['code'] = empty($_POST['newCode'])?$_POST['code']:$_POST['newCode'];
-            $theme['name'] = empty($_POST['newName'])?$_POST['name']:$_POST['newName'];
+            $codeArr = explode("@",$_POST['code']);
+            $_SESSION['theme']['code'] = $theme['code'] = empty($_POST['newCode'])?$codeArr[0]:$_POST['newCode'];
+            $_SESSION['theme']['name'] = $theme['name'] = empty($_POST['newName'])?$codeArr[1]:$_POST['newName'];
             $errors = self::$errors;
 //            foreach ($arrayTests as $arr){
 //                $theme = $arr['theme'];
@@ -206,9 +202,38 @@ class Admin extends Page
         }
 
         if(isset($_POST['submit'])) {
+            foreach ($_SESSION['tests'] as $arr){
+                $code = 'Theme';
+                $num = $arr['number'];
+                /**
+                 * Запись вопроса
+                 * INSERT INTO `quest` (`theme_code`, `quest_number`, `quest_text`) VALUES
+                 * ('feld', 2, 'ИМПУЛЬС, ВЫШЕДШИЙ ИЗ А/В УЗЛА, ВЫГЛЯДИТ НА ЭКГ КАК')
+                 */
+                $stringQuest[] = [
+                    $code,
+                    $num,
+                    "'".addslashes($arr['quest'])."'"
+                ];
+                /**
+                 * Запись ответа
+                 * INSERT INTO `answ` (`quest_id`, `answ_order`, `answ_right`, `answ_text`) VALUES
+                 * (1, 1, 0, 'Правильное чередование +зубцов Р, нормальных QRS с ЧСС 40-60 в 1 мин')
+                 */
+                foreach($arr['answers'] as $key => $answer){
+                   $stringAnsw[] = [
+                       $num,
+                       $key,
+                       $answer['right'],
+                       "'".addslashes($answer['text'])."'"
+                   ];
+                }
+            }
+            // возвращаемое значение - строка для записи в БД -  неподготовленные строки
+            echo "<pre>";
+            print_r($stringAnsw);
+            print_r($stringQuest);
 	        echo "<pre>";
-	        print_r($_SESSION['tests']);
-	        echo "</pre>";
         }
 	}
 
