@@ -7,16 +7,16 @@
 class Admin extends Page
 {
     /**
-     * @var string $regexQuest - регулярное выражение для поиска вопроса
-     * @var string $regexAnsv - регулярное выражение для поиска ответа
-     * @var string $regexRight - регулярное выражение для поиска правильного ответа
+     * @var string $regexpQuest - регулярное выражение для поиска вопроса
+     * @var string $regexpAnswer - регулярное выражение для поиска ответа
+     * @var string $regexpRight - регулярное выражение для поиска правильного ответа
      */
-    protected static $regexQuest = "#^[\s|\t]*[\#|№]+[\s|\t]*([0-9]*)(.*)$#u";
-    protected static $regexAnsv = "#^[\s|\t]*([a-zA-Zа-яА-ЯёЁ\s]+)\)(.+)#u";
-    protected static $regexRight = "#^[\s|\t]*([0-9]+)[\s\t]*([а-яА-Яa-zA-Z|,\s]{1,10})$#u";
+    protected static $regexpQuest = "#^[\s|\t]*[\#|№]+[\s|\t]*([0-9]*)(.*)$#u";
+    protected static $regexpAnswer = "#^[\s|\t]*([a-zA-Zа-яА-ЯёЁ\s]+)\)(.+)#u";
+    protected static $regexpRight = "#^[\s|\t]*([0-9]+)[\s\t]*([а-яА-Яa-zA-Z|,\s]{1,10})$#u";
     protected static $errors = '';
     /**
-     * функция преобразования букв в порядковые номера
+     * метод преобразования букв в порядковые номера
      * @param string $liter - входящий символ или строка
      * @return string  - преобразованый символ или строка
      */
@@ -32,7 +32,7 @@ class Admin extends Page
     }
 
     /**
-     * Функция обработки текста в массив вопросов
+     * метод обработки текста в массив вопросов
      * @param array $arrayStr входящий массив строк
      * @return array $quests - возвращаемый массив вопросов
      *
@@ -58,32 +58,31 @@ class Admin extends Page
         $prevQW = 0;
         $diffAnswer = [];
         foreach($arrayStr as $string){
-            if (preg_match(self::$regexQuest, $string, $q)) //чтение вопроса
+            if (preg_match(self::$regexpQuest, $string, $q)) //чтение вопроса
             {
                 $quests_num = (int)$q[1];
                 // очищаем от лишних символов и убираем перевод строк
                 $quests[$quests_num]['quest'] = str_replace(
-                    ["\n","\r"],"",trim($q[2],"\x00..\x2F \x3A..\x3B")
+                    ["\n","\r"],"",trim($q[2],"\x00..\x20 ;:.")
                 );
                 $quests[$quests_num]['number'] = $quests_num;
                 $countQuest++;
             }
-            elseif (preg_match(self::$regexAnsv, $string, $a)) //чтение вариантов ответа
+            elseif (preg_match(self::$regexpAnswer, $string, $a)) //чтение вариантов ответа
             {
                 $order = self::literToNum($a[1]);
-                //$text = trim($a[2],".:;\s\t ");
                 $quests[$quests_num]['answers'][$order] = [
                     'order' => $order,
                     'right' => 0,
                     // очищаем от лишних символов и убираем перевод строк
-                    'text' => str_replace(["\n","\r"],"",trim($a[2],"\x00..\x20 \x3A..\x3B"))
+                    'text' => str_replace(["\n","\r"],"",trim($a[2],"\x00..\x20 ;:."))
                 ];
                 if($prevQW !== $quests_num){
                     $prevQW = $quests_num;
                     $countAnswer++;
                 }
             }
-            if (preg_match(self::$regexRight, $string, $a)) //чтение правильного ответа
+            if (preg_match(self::$regexpRight, $string, $a)) //чтение правильного ответа
             {
                 // если ответы написаны через пробел или запятую
                 $str = preg_split("#[,\s]*#u", $a[2]);
@@ -139,21 +138,19 @@ class Admin extends Page
     }
 
     /**
-     * Функция подготовки полученного текста
+     * метод проверки наличия полученного текста и подготовки текста
      * в массив для дальнейшей переработки
-     * @return array $test - массив необработанных строк (вопросы, ответы)
+     * @return array|bool - массив необработанных строк (вопросы, ответы)
      */
     protected function prepareQuests(){
-        $test = null;
-        if(!empty($_FILES['file']['tmp_name']) || $_FILES['file']['type'] == "text/plain"){
-            $test = file($_FILES['file']['tmp_name']);
-
+        if(!empty($_FILES['file']['tmp_name']) || $_FILES['file']['type'] === "text/plain"){
+            $text = file_get_contents($_FILES['file']['tmp_name']);
+            return explode("\n",strip_tags($text));
         }
-
-
-        if(!empty($_POST['text']))
-            $test = explode("\n",$_POST['text']);
-        return $test;
+        elseif(!empty($_POST['text'])){
+            return explode("\n",strip_tags($_POST['text']));
+        }
+        return false;
     }
 
     /**
@@ -165,76 +162,86 @@ class Admin extends Page
         $nav = $this->setMenu("admin_menu");
         include VIEW_DIR_INCLUDE.'nav.php';
     }
+
+    /**
+     * метод показа загруженных тестов для добавления в базу
+     */
+    protected function previewAddTest($preTest){
+        $_POST['code'];
+        $_SESSION['tests'] = $tests = $this->convertQuests($preTest);
+        echo "<pre>";
+        //print_r($tests);
+        echo "</pre>";
+        $_SESSION['theme']['code'] = $theme['code'] = strip_tags($_POST['code'][0]);
+        $_SESSION['theme']['name'] = $theme['name'] = strip_tags($_POST['name'][0]);
+        $errors = self::$errors;
+        include VIEW_DIR_ADMIN.'addtest_preview.php';
+    }
+
+    private function insertAddTest(){
+        echo "<pre>";
+        $prepareQuest = DBase::prepare("INSERT INTO `quest` ".
+            "(`theme_code`, `quest_number`, `quest_text`) ".
+            "VALUES (?,?,?)"
+        );
+        $prepareAnswer = DBase::prepare("INSERT INTO `answ` ".
+            "(`quest_id`, `answ_order`, `answ_right`, `answ_text`) ".
+            "VALUES (?,?,?,?)"
+        );
+        //$stringAnswPrepare = "INSERT INTO `answ` (`quest_id`, `answ_order`, `answ_right`, `answ_text`) VALUES (?,?,?,?)";
+        //$stringQuestPrepare = "INSERT INTO `quest` (`theme_code`, `quest_number`, `quest_text`) VALUES (?,?,?)";
+
+        try{
+                foreach ($_SESSION['tests'] as $arr){
+                    $code = $_SESSION['theme']['code'];
+                    $num = $arr['number'];
+                    /**
+                     * Запись вопроса
+                     * INSERT INTO `quest` (`theme_code`, `quest_number`, `quest_text`) VALUES
+                     * ('feld', 2, 'ИМПУЛЬС, ВЫШЕДШИЙ ИЗ А/В УЗЛА, ВЫГЛЯДИТ НА ЭКГ КАК')
+                     */
+                    $ee = [$code, $num, "".addslashes($arr['quest']).""];
+                    echo "<br>Q ";
+                    print_r($ee);
+                    var_dump($prepareQuest->execute($ee));
+                    /**
+                     * Запись ответа
+                     * INSERT INTO `answ` (`quest_id`, `answ_order`, `answ_right`, `answ_text`) VALUES
+                     * (1, 1, 0, 'Правильное чередование +зубцов Р, нормальных QRS с ЧСС 40-60 в 1 мин')
+                     */
+                    foreach($arr['answers'] as $key => $answer){
+                        $ee = [$num, $key, $answer['right'],
+                            "".addslashes($answer['text']).""];
+                        echo "<br>A ";
+                        print_r($ee);
+                        var_dump($prepareAnswer->execute($ee));
+                    }
+                }
+            }catch (Exception $e){
+                echo "Ошибка записи в базу: ".$e;
+            }
+
+            echo "Ok!";
+    }
+    /**
+     * метод подготовки отображения основной части станицы
+     * @param string $template
+     */
     protected function prepareBody($template)
 	{
-        /**
-         * 1. Формирование массива вопросов - ответов
-         *
-         * @var array $arrayTests
-         */
-        $test = new Test();
-        $theme = $test->getThemeList();
-        //print_r($theme);
-	    if(empty($this->prepareQuests())){
-            include VIEW_DIR_ADMIN.$template.'.php';
+        $theme = Test::getThemeList();
+        $preTest = $this->prepareQuests();
+	    if($preTest){
+            $this->previewAddTest($preTest);
         }
         else{
-            // вывод на страницу результат
-            $tests = $this->convertQuests(
-                $this->prepareQuests()
-            );
-            $_SESSION['tests'] = $tests;
-            echo "<pre>";
-            //print_r($tests);
-            echo "</pre>";
-            $codeArr = explode("@",$_POST['code']);
-            $_SESSION['theme']['code'] = $theme['code'] = empty($_POST['newCode'])?$codeArr[0]:$_POST['newCode'];
-            $_SESSION['theme']['name'] = $theme['name'] = empty($_POST['newName'])?$codeArr[1]:$_POST['newName'];
-            $errors = self::$errors;
-//            foreach ($arrayTests as $arr){
-//                $theme = $arr['theme'];
-//                $code = 'Theme';
-//                $num = $arr['number'];
-//                $quest = $arr['quest'];
-//                $answers = $arr['answers'];
-                include VIEW_DIR_ADMIN.'addtest_preview.php';
-//            }
+            include VIEW_DIR_ADMIN.$template.'.php';
+        }
+        if(isset($_POST['submit'])) {
+	        $this->insertAddTest();
         }
 
-        if(isset($_POST['submit'])) {
-            foreach ($_SESSION['tests'] as $arr){
-                $code = 'Theme';
-                $num = $arr['number'];
-                /**
-                 * Запись вопроса
-                 * INSERT INTO `quest` (`theme_code`, `quest_number`, `quest_text`) VALUES
-                 * ('feld', 2, 'ИМПУЛЬС, ВЫШЕДШИЙ ИЗ А/В УЗЛА, ВЫГЛЯДИТ НА ЭКГ КАК')
-                 */
-                $stringQuest[] = [
-                    $code,
-                    $num,
-                    "'".addslashes($arr['quest'])."'"
-                ];
-                /**
-                 * Запись ответа
-                 * INSERT INTO `answ` (`quest_id`, `answ_order`, `answ_right`, `answ_text`) VALUES
-                 * (1, 1, 0, 'Правильное чередование +зубцов Р, нормальных QRS с ЧСС 40-60 в 1 мин')
-                 */
-                foreach($arr['answers'] as $key => $answer){
-                   $stringAnsw[] = [
-                       $num,
-                       $key,
-                       $answer['right'],
-                       "'".addslashes($answer['text'])."'"
-                   ];
-                }
-            }
-            // возвращаемое значение - строка для записи в БД -  неподготовленные строки
-            echo "<pre>";
-            print_r($stringAnsw);
-            print_r($stringQuest);
-	        echo "<pre>";
-        }
+
 	}
 
 //	public function renderHtml($code)
