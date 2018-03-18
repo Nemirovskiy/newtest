@@ -15,11 +15,13 @@ class Test extends Page
      */
     protected function prepareBody($testTheme)
     {
-        $number = 2; // будем получать из метода генерации номера
+        $count = DBase::select("SELECT COUNT(*) as count FROM quest WHERE theme_code = ?",[$testTheme]);
+        print_r($count[0]['count']);
+        $number = rand(1,$count[0]['count']); // будем получать из метода генерации номера
         $random = false; // будем получать из метода получения пользовательских настроек
         $arr = $this->getTest($testTheme,$number,$random);
         echo "<pre>";
-        print_r($arr);
+        //print_r($arr);
         echo "</pre>";
         if(empty($arr)){
             include VIEW_DIR_TEST.'notest.php';
@@ -44,7 +46,7 @@ class Test extends Page
      */
     protected function getTest($theme,$number,$rnd = false){
         $query = "SELECT * from quest INNER JOIN theme ON (quest.theme_code = theme.theme_code)
-                  INNER JOIN answ ON (quest.quest_id = answ.quest_id) WHERE theme.theme_code = ? AND quest_number = ?";
+                  INNER JOIN answ ON (quest.quest_number = answ.quest_id) WHERE theme.theme_code = ? AND quest_number = ?";
         $tests = DBase::select($query,[$theme,$number]);
         if(empty($tests)) return false;
         $result =[];
@@ -62,7 +64,7 @@ class Test extends Page
         return $result;
     }
 
-    function getThemeList(){
+    public static function getThemeList(){
         return $tests = DBase::select("SELECT * FROM theme ");
     }
 }
