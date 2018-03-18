@@ -30,4 +30,32 @@ class DBase
         }
         return false;
     }
+    public static function prepare($query){
+        return self::baseConnect()->prepare($query);
+    }
+    public static function insert($query,$param=[]){
+        $result = self::baseConnect()->prepare($query);
+        if(is_array($param[0])){
+            foreach ($param as $item){
+                return $result->execute($item);
+            }
+        }
+        else{
+                return $result->execute($param);
+            }
+
+        /*$result->beginTransaction();
+        try{
+            if(is_array($param[0])){
+                foreach ($param as $item){
+                    $result->execute($item);
+                }
+                $result->commit();
+            }
+        }catch(PDOException $e) {
+            $result->rollBack();
+            return false;
+        }*/
+        return false;
+    }
 }
