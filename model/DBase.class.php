@@ -30,32 +30,84 @@ class DBase
         }
         return false;
     }
-    public static function prepare($query){
-        return self::baseConnect()->prepare($query);
-    }
-    public static function insert($query,$param=[]){
-        $result = self::baseConnect()->prepare($query);
-        if(is_array($param[0])){
-            foreach ($param as $item){
-                return $result->execute($item);
-            }
-        }
-        else{
-                return $result->execute($param);
-            }
+//    public static function prepare($query){
+//        return self::baseConnect()->prepare($query);
+//    }
+//    public static function lastAddId(){
+//        return self::baseConnect()->lastInsertId();
+//    }
 
-        /*$result->beginTransaction();
-        try{
-            if(is_array($param[0])){
-                foreach ($param as $item){
-                    $result->execute($item);
-                }
-                $result->commit();
-            }
-        }catch(PDOException $e) {
-            $result->rollBack();
+    /**
+     * метод удаления тестов (вопросов и ответов) указанной темы
+     * @param string $theme
+     * @param int $count
+     * @return bool
+     */
+    public static function delAllFromTheme($theme){
+        $query = "DELETE quest,answ FROM quest INNER JOIN answ ".
+            "WHERE quest.quest_id = answ.quest_id AND quest.theme_code = ?; ";
+        $result = self::baseConnect()->prepare($query);
+        //if($result->execute([$theme]))
+            return $result->execute([$theme]);
+        //else
+        //    return false;
+    }
+    public static function updateThemeCount($theme,$count=0){
+        $query = "UPDATE theme SET theme.theme_count = ? WHERE theme.theme_code = ?;";
+        $result = self::baseConnect()->prepare($query);
+       // if()
+            return $result->execute([$count,$theme]);
+//        else
+//            return false;
+    }
+
+    /**
+     * @param $theme
+     * @return bool
+     * INSERT INTO `theme` (`theme_code`, `theme_text`, `theme_count`) VALUES ('eee', 'ddd', '111')
+     */
+    public static function insertTheme($theme){
+        $query = "INSERT INTO `theme` (`theme_code`, `theme_text`, `theme_count`) ".
+            "VALUES (?, ?, ?)";
+        $result = self::baseConnect()->prepare($query);
+        if($result->execute([$theme['code'],$theme['name'],$theme['count']]))
+            return true;
+        else
             return false;
-        }*/
-        return false;
+    }
+
+    /**
+     * @param array $param
+     * @return bool|string
+     * Запись вопроса
+     * INSERT INTO `quest` (`theme_code`, `quest_number`, `quest_text`) VALUES
+     * ('feld', 2, 'ИМПУЛЬС, ВЫШЕДШИЙ ИЗ А/В УЗЛА, ВЫГЛЯДИТ НА ЭКГ КАК')
+     *
+     */
+    public static function insertAddQuest($param=[]){
+        $query = "INSERT INTO `quest` (`theme_code`, `quest_number`, `quest_text`) ".
+            "VALUES (?,?,?)";
+        $result = self::baseConnect()->prepare($query);
+        if($result->execute($param))
+            return self::baseConnect()->lastInsertId();
+        else
+            return false;
+    }
+    /**
+     * @param array $param
+     * @return bool|string
+     *
+     * Запись ответа
+     * INSERT INTO `answ` (`quest_id`, `answ_order`, `answ_right`, `answ_text`) VALUES
+     * (1, 1, 0, 'Правильное чередование +зубцов Р, нормальных QRS с ЧСС 40-60 в 1 мин')
+     */
+    public static function insertAddAnswer($param=[]){
+        $query = "INSERT INTO `answ` (`quest_id`, `answ_order`, `answ_right`, `answ_text`) ".
+            "VALUES (?,?,?,?)";
+        $result = self::baseConnect()->prepare($query);
+        if($result->execute($param))
+            return self::baseConnect()->lastInsertId();
+        else
+            return false;
     }
 }

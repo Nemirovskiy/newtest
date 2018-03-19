@@ -15,6 +15,7 @@ class Admin extends Page
     protected static $regexpAnswer = "#^[\s|\t]*([a-zA-Zа-яА-ЯёЁ\s]+)\)(.+)#u";
     protected static $regexpRight = "#^[\s|\t]*([0-9]+)[\s\t]*([а-яА-Яa-zA-Z|,\s]{1,10})$#u";
     protected static $errors = '';
+    protected static $message = '';
     /**
      * метод преобразования букв в порядковые номера
      * @param string $liter - входящий символ или строка
@@ -39,13 +40,13 @@ class Admin extends Page
      */
     protected function convertQuests($arrayStr){
         /**
-         * @var array $quests - возвращаемый массив вопросов
-         * @var int $quests_num -  номер текущего вопроса
-         * @var array $prevQ - массав с предыдущими номерами вопросов, для подсчета правильных ответов
-         * @var int $countQuest - количество загруженных вопросов
-         * @var int $countAnswer - количество ответов (мин 1 на вопрос)
-         * @var int $countRight - количество правильных ответов (мин 1 на вопрос)
-         * @var array $diffAnswer - кол-во несоответствий верных ответов (верный ответ больше кол-ва ответов)
+         * @var array $quests      - возвращаемый массив вопросов
+         * @var int   $quests_num  -  номер текущего вопроса
+         * @var array $prevQ       - массав с предыдущими номерами вопросов, для подсчета правильных ответов
+         * @var int   $countQuest  - количество загруженных вопросов
+         * @var int   $countAnswer - количество ответов (мин 1 на вопрос)
+         * @var int   $countRight  - количество правильных ответов (мин 1 на вопрос)
+         * @var array $diffAnswer  - кол-во несоответствий верных ответов (верный ответ больше кол-ва ответов)
          *
          */
 
@@ -121,19 +122,18 @@ class Admin extends Page
          */
         if($countQuest !== $countAnswer){
             self::$errors .= "Количество вопросов не соответствует ответам "
-                ."(на каждый вопрос должен быть хотябы один ответ)";
+                ."(на каждый вопрос должен быть хотябы один ответ)<br>";
         }
         if($countAnswer !== $countRight){
-            if(strlen(self::$errors)>0) self::$errors .="<br>";
             self::$errors .= "Количество правильных ответов не соответствует ".
-                "количеству ответов (должен быть хотя бы один верный ответ)";
+                "количеству ответов (должен быть хотя бы один верный ответ)<br>";
         }
         if(count($diffAnswer)>0){
-            if(strlen(self::$errors)>0) self::$errors .="<br>";
             self::$errors .= "Указанный верный ответ в вопросе ".
                 implode($diffAnswer," ") ." не соответствует ".
-                "количеству ответов (должен быть не больше, чем вариантов ответа)";
+                "количеству ответов (должен быть не больше, чем вариантов ответа)<br>";
         }
+        self::$message .= "Будет добавленно $countQuest вопросов.<br>";
         return $quests;
     }
 
@@ -162,87 +162,118 @@ class Admin extends Page
         $nav = $this->setMenu("admin_menu");
         include VIEW_DIR_INCLUDE.'nav.php';
     }
+    /**
+     * метод добавления загруженных тестов в базу
+     *
+     */
+    private function insertAddTest(){
+        /**
+         * @var int $lastQuest -
+         *
+         */
+        $code = $_SESSION['theme']['code'];
+        $count = 0;
+        try{
+            if(isset(Test::getThemeList()[$code])){
+                if(!DBase::delAllFromTheme($code)){
+                    self::$errors .= "Ошибка очистки темы $code";
+                    return false;
+                }
+            }
+            else{
+                echo "<br>добавляем тему $code<br>";
+                $theme = [
+                    'code'=>$code,
+                    'name'=>$_SESSION['theme']['name'],
+                    'count'=> 0
+                ];
+                if(DBase::insertTheme($theme)){
+                    self::$message .= "Добавлена тема ".$theme['code']." - ". $theme['name']."<br>";
+                }else{
+                    self::$errors .= "Ошибка добавления темы ".$theme['code']." - ". $theme['name']."<br>";
+                    return false;
+                }
+            }
+            foreach ($_SESSION['tests'] as $tests){
+                $num = $tests['number'];
+                $value = [$code, $tests['number'], $tests['quest']];
+                // вызываем добавление вопроса
+                // возвращается ID вопроса или false
+                $addQuest = DBase::insertAddQuest($value);
+                // если успешная запись вопроса увеличить счетчик вопросов на 1
+                if($addQuest)
+                    $count++;
+                else{
+                    self::$errors .= "Ошибка записи вопроса $num<br>";
+                    return false;
+                }
+                // перебор вариантов ответов
+                foreach($tests['answers'] as $key => $answer){
+                    $value = [
+                        $addQuest,
+                        $key,
+                        $answer['right'],
+                        $answer['text']
+                    ];
+                    if(!DBase::insertAddAnswer($value)){
+                        self::$errors .= "Ошибка записи ответа $key на вопрос $num<br>";
+                        return false;
+                    }
+                }
+            }
+            if(!DBase::updateThemeCount($code,$count)){
+                self::$errors .= "Ошибка обновления темы<br>";
+                return false;
+            }
+        }catch (Exception $e){
+            echo "Ошибка записи в базу: ".$e;
+        }
+        if(empty(self::$errors))
+            self::$message .= "Добавлено вопросов $count<br>";
+        return $count;
+    }
 
     /**
      * метод показа загруженных тестов для добавления в базу
      */
     protected function previewAddTest($preTest){
-        $_POST['code'];
-        $_SESSION['tests'] = $tests = $this->convertQuests($preTest);
-        echo "<pre>";
-        //print_r($tests);
-        echo "</pre>";
-        $_SESSION['theme']['code'] = $theme['code'] = strip_tags($_POST['code'][0]);
-        $_SESSION['theme']['name'] = $theme['name'] = strip_tags($_POST['name'][0]);
-        $errors = self::$errors;
+        if(empty($_POST['code'][0]) && empty($_POST['code'][1])){
+            self::$errors .= "Не указана тема для добавления тестов.<br>";
+        }else{
+            $theme['code'] = $_SESSION['theme']['code'] = strip_tags($_POST['code'][0]);
+            $theme['name'] = $_SESSION['theme']['name'] = strip_tags($_POST['name'][0]);
+        }
+        $tests = $_SESSION['tests'] = $this->convertQuests($preTest);
+        $errors = trim(self::$errors,"<br>");
+        $message = trim(self::$message,"<br>");
         include VIEW_DIR_ADMIN.'addtest_preview.php';
-    }
-
-    private function insertAddTest(){
-        echo "<pre>";
-        $prepareQuest = DBase::prepare("INSERT INTO `quest` ".
-            "(`theme_code`, `quest_number`, `quest_text`) ".
-            "VALUES (?,?,?)"
-        );
-        $prepareAnswer = DBase::prepare("INSERT INTO `answ` ".
-            "(`quest_id`, `answ_order`, `answ_right`, `answ_text`) ".
-            "VALUES (?,?,?,?)"
-        );
-        //$stringAnswPrepare = "INSERT INTO `answ` (`quest_id`, `answ_order`, `answ_right`, `answ_text`) VALUES (?,?,?,?)";
-        //$stringQuestPrepare = "INSERT INTO `quest` (`theme_code`, `quest_number`, `quest_text`) VALUES (?,?,?)";
-
-        try{
-                foreach ($_SESSION['tests'] as $arr){
-                    $code = $_SESSION['theme']['code'];
-                    $num = $arr['number'];
-                    /**
-                     * Запись вопроса
-                     * INSERT INTO `quest` (`theme_code`, `quest_number`, `quest_text`) VALUES
-                     * ('feld', 2, 'ИМПУЛЬС, ВЫШЕДШИЙ ИЗ А/В УЗЛА, ВЫГЛЯДИТ НА ЭКГ КАК')
-                     */
-                    $ee = [$code, $num, "".addslashes($arr['quest']).""];
-                    echo "<br>Q ";
-                    print_r($ee);
-                    var_dump($prepareQuest->execute($ee));
-                    /**
-                     * Запись ответа
-                     * INSERT INTO `answ` (`quest_id`, `answ_order`, `answ_right`, `answ_text`) VALUES
-                     * (1, 1, 0, 'Правильное чередование +зубцов Р, нормальных QRS с ЧСС 40-60 в 1 мин')
-                     */
-                    foreach($arr['answers'] as $key => $answer){
-                        $ee = [$num, $key, $answer['right'],
-                            "".addslashes($answer['text']).""];
-                        echo "<br>A ";
-                        print_r($ee);
-                        var_dump($prepareAnswer->execute($ee));
-                    }
-                }
-            }catch (Exception $e){
-                echo "Ошибка записи в базу: ".$e;
-            }
-
-            echo "Ok!";
     }
     /**
      * метод подготовки отображения основной части станицы
      * @param string $template
      */
     protected function prepareBody($template)
-	{
+    {
         $theme = Test::getThemeList();
         $preTest = $this->prepareQuests();
-	    if($preTest){
+
+        if($preTest && $template === "addtest"){
             $this->previewAddTest($preTest);
         }
-        else{
+        elseif(isset($_POST['submit'])) {
+            $this->insertAddTest();
+            $errors = trim(self::$errors,"<br>");
+            $message = trim(self::$message,"<br>");
             include VIEW_DIR_ADMIN.$template.'.php';
         }
-        if(isset($_POST['submit'])) {
-	        $this->insertAddTest();
+        else
+            {
+            $errors = trim(self::$errors,"<br>");
+            $message = trim(self::$message,"<br>");
+            include VIEW_DIR_ADMIN.$template.'.php';
         }
-
-
-	}
+       // echo " == $message ==";
+    }
 
 //	public function renderHtml($code)
 //	{
