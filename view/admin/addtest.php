@@ -10,6 +10,9 @@
 </style>
 <div class='cntr'>
 <h1>Добавление тестов</h1>
+    <? if(!empty($message)): ?>
+        <h4 style="color: blue;"><?=$message?></h4>
+    <?endif;?>
     <form method="POST" enctype="multipart/form-data" style="text-align: left;">
         <label>
             <input checked type="radio" id="theme" value="new">
@@ -20,9 +23,9 @@
                 foreach ($theme as $item):
             ?>
                     <label>
-                        <input type="radio" name="code[]" value="<?=$item['theme_code']?>">
-                        <input type="radio" name="name[]" value="<?=$item['theme_text']?>">
-                        <?=$item['theme_code']?> - <?=$item['theme_text']?>
+                        <input type="radio" name="code[]" value="<?=$item['code']?>">
+                        <input type="radio" name="name[]" value="<?=$item['text']?>">
+                        <?=$item['code']?> - <?=$item['text']?>
                     </label><br>
             <?
                 endforeach;
