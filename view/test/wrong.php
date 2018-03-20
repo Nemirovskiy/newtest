@@ -1,4 +1,4 @@
-Вопрос № 3
+<!--Вопрос № 3
 <br>
 ИМПУЛЬС, ВЫШЕДШИЙ ИЗ ЦЕНТРА АВТОМАТИЗМА Ш ПОРЯДКА ВЫГЛЯДИТ КАК:
 <ul>
@@ -18,4 +18,23 @@
 Вопросы: 1 из 3 (33%)
 <br>
 Верно: 0, всего: 1 (0%)
-<br>
+<br-->
+<pre><?print_r($_SESSION)?></pre>
+<h1>Вопросы по теме <?=$theme?></h1>
+<form action="" id="main" method="post">
+    <h2>Вопрос № <?=$num?></h2>
+    <h3><?=$quest?></h3>
+    <ul>
+        <? foreach($answers as $answer): ?>
+            <li class="<?
+            if($answer['right']) echo "r_otv";
+            if($answer['check'] === true) echo " m_otv";
+            ?>">
+                <p><?=$answer['text']?></p>
+            </li>
+        <? endforeach; ?>
+    </ul>
+    <div class='cntr'>
+        <input type='submit' value='Ok' style="padding: 10px 100px;">
+    </div>
+</form>

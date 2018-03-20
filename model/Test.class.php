@@ -10,36 +10,58 @@ class Test extends Page
 	public static $quest   = ''  ; 	// Текст вопроса
 	public static $answers = []  ; 	// ответы
 
+    private function checkAnswer($theme){
+            $answer = $_POST[$theme];
+            $right = $_SESSION["curent"]["right"];
+            foreach ($answer as $item){
+                $_SESSION["curent"]["answers"][$item - 1]['check'] = true;
+            }
+
+            echo "<br>отвечено: ".implode(",",$answer);
+            echo "<br>надо: ".implode(",",$right);
+            echo "<hr>";
+            if(implode(",",$answer) === implode(",",$right))
+                return true;
+            else
+                return false;
+    }
     /**
      * Метод подготовки основгой части страницы
      * @param string $testTheme - тема теста
      */
     protected function prepareBody($testTheme)
     {
-        $count = DBase::select("SELECT COUNT(*) as count FROM quest WHERE theme_code = ?",[$testTheme]);
-
-        $number = rand(1,$count[0]['count']); // будем получать из метода генерации номера
-        echo "Всего вопросов - ". $count[0]['count'] . " текущий - ".$number;
+        $number = rand(1,self::getThemeList()[$testTheme]['count']);
+        echo "Всего вопросов - ". self::getThemeList()[$testTheme]['count'] . " текущий - ".$number;
         $random = false; // будем получать из метода получения пользовательских настроек
-        $arr = $this->getTest($testTheme,$number,$random);
-        echo "<pre>";
-        print_r(Test::getThemeList());
-        var_dump(isset(Test::getThemeList()[$testTheme]));
-        var_dump(array_key_exists($testTheme,Test::getThemeList()));
-        //print_r($arr);
-        echo "</pre>";
-        if(empty($arr)){
-            include VIEW_DIR_TEST.'notest.php';
+        $test = $this->getTest($testTheme,$number,$random);
+
+        if(empty($test)){
+            include VIEW_DIR_TEST."notest.php";
+        }
+        elseif(isset($_POST[$testTheme])) {
+            if ($this->checkAnswer($testTheme))
+                echo "Верно!";
+            else
+                echo "Ошибка!";
+            $theme = $_SESSION["curent"]["theme"];
+            //$_SESSION["curent"]["code"] = $code = $testTheme;
+            $num = $_SESSION["curent"]["number"];
+            $quest = $_SESSION["curent"]["quest"];
+            $answers = $_SESSION["curent"]["answers"];
+            include VIEW_DIR_TEST."wrong.php";
         }
         else{
-            $theme = $arr['theme'];
-            $code = $testTheme;
-            $num = $arr['number'];
-            $quest = $arr['quest'];
-            $answers = $arr['answers'];
-            include VIEW_DIR_TEST.'test.php';
+            $_SESSION["curent"] = $test;
+            $theme = $test["theme"];
+            $_SESSION["curent"]["code"] = $code = $testTheme;
+            $num = $test["number"];
+            $quest = $test["quest"];
+            $answers = $test["answers"];
+            include VIEW_DIR_TEST."test.php";
         }
-        include VIEW_DIR_TEST.'footer.php';
+        include VIEW_DIR_TEST."footer.php";
+
     }
 
     /**
@@ -64,10 +86,30 @@ class Test extends Page
                 'right' => $item['answ_right'],
                 'text' => $item['answ_text']
             ];
+
+            if($item['answ_right'] == 1) $result['right'][] = $item['answ_order'];
+
         }
         if($rnd) shuffle($result['answers']);
         return $result;
     }
+
+    /**
+     * структура хранения вопросов в сессии
+     *
+     * запись при ответе:
+     * $_SESSION['used'][$theme][]  - массив отвеченных вопросов в теме
+     * $_SESSION['right'][$theme][] - массив правильных ответов в теме
+     * $_SESSION['curent'][
+     *       'theme'=> текущая тема
+     *       'quest'=> [массив вопроса]
+     * добавить при ответе:
+     *       'used'=>  [массив выбранных вариантов]
+     * ]
+     *
+     * $_COOKIE['used']
+     */
+
 
     public static function getThemeList(){
         if(self::$list === null){
