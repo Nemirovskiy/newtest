@@ -260,6 +260,14 @@ class Admin extends Page
         if($preTest && $template === "addtest"){
             $this->previewAddTest($preTest);
         }
+        elseif (isset($_POST['code'][0])){
+            $code = strip_tags($_POST['code'][0]);
+            $query = "SELECT * from quest INNER JOIN theme ON (quest.theme_code = theme.theme_code)
+                  INNER JOIN answ ON (quest.quest_id = answ.quest_id) WHERE theme.theme_code = ? AND quest_number > 0";
+            $tests = DBase::select($query,[$code]);
+            print_r($tests);
+            //$this->previewAddTest($tests);
+        }
         elseif(isset($_POST['submit'])) {
             $this->insertAddTest();
             $errors = trim(self::$errors,"<br>");

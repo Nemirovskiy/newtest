@@ -32,8 +32,9 @@
             ?>
         </input>
         <input type="file" name="file">
-        <textarea name="text"></textarea>
-        <input type="submit" value="отправить">
+        <textarea name="text"></textarea><br>
+        <input type="submit" value="Добавить тест"><br>
+        <input type="submit" value="Просмотреть тесты">
     </form>
     <script>
         $(function () {
