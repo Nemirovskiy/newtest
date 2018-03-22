@@ -1,6 +1,9 @@
 <h1>Вопросы по теме <?=$theme?></h1>
+<div class="message">
+    <?=$message?>
+</div>
 <form action="" id="main" method="post">
-    <h2>Вопрос № <?=$num?></h2>
+    <h2>Вопрос № <?=$number?></h2>
     <h3><?=$quest?></h3>
     <ul>
     	<? foreach($answers as $answer): ?>
