@@ -12,9 +12,11 @@
 */
 class Page extends Model
 {
+    protected $errors = '';
+    protected $message = '';
 	protected $title='Тестирование - Главная'; // заголовок
 	private $nav=[];	 // навигация
-	private $code='';	 // символьное имя - код страницы
+	protected $code='';	 // символьное имя - код страницы
     private $list= null;	 // список всех страниц
 
     protected function getList($menu = "menu")
