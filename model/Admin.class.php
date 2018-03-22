@@ -14,8 +14,6 @@ class Admin extends Page
     protected static $regexpQuest = "#^[\s|\t]*[\#|№]+[\s|\t]*([0-9]*)(.*)$#u";
     protected static $regexpAnswer = "#^[\s|\t]*([a-zA-Zа-яА-ЯёЁ\s]+)\)(.+)#u";
     protected static $regexpRight = "#^[\s|\t]*([0-9]+)[\s\t]*([а-яА-Яa-zA-Z|,\s]{1,10})$#u";
-    protected static $errors = '';
-    protected static $message = '';
     /**
      * метод преобразования букв в порядковые номера
      * @param string $liter - входящий символ или строка
@@ -121,19 +119,19 @@ class Admin extends Page
          * проверка подсчета кол-ва вопросов - ответов - верных ответов
          */
         if($countQuest !== $countAnswer){
-            self::$errors .= "Количество вопросов не соответствует ответам "
+            $this->errors .= "Количество вопросов не соответствует ответам "
                 ."(на каждый вопрос должен быть хотябы один ответ)<br>";
         }
         if($countAnswer !== $countRight){
-            self::$errors .= "Количество правильных ответов не соответствует ".
+            $this->errors .= "Количество правильных ответов не соответствует ".
                 "количеству ответов (должен быть хотя бы один верный ответ)<br>";
         }
         if(count($diffAnswer)>0){
-            self::$errors .= "Указанный верный ответ в вопросе ".
+            $this->errors .= "Указанный верный ответ в вопросе ".
                 implode($diffAnswer," ") ." не соответствует ".
                 "количеству ответов (должен быть не больше, чем вариантов ответа)<br>";
         }
-        self::$message .= "Будет добавленно $countQuest вопросов.<br>";
+        $this->message .= "Будет добавленно $countQuest вопросов.<br>";
         return $quests;
     }
 
@@ -176,7 +174,7 @@ class Admin extends Page
         try{
             if(isset(Test::getThemeList()[$code])){
                 if(!DBase::delAllFromTheme($code)){
-                    self::$errors .= "Ошибка очистки темы $code";
+                    $this->errors .= "Ошибка очистки темы $code";
                     return false;
                 }
             }
@@ -188,9 +186,9 @@ class Admin extends Page
                     'count'=> 0
                 ];
                 if(DBase::insertTheme($theme)){
-                    self::$message .= "Добавлена тема ".$theme['code']." - ". $theme['name']."<br>";
+                    $this->message .= "Добавлена тема ".$theme['code']." - ". $theme['name']."<br>";
                 }else{
-                    self::$errors .= "Ошибка добавления темы ".$theme['code']." - ". $theme['name']."<br>";
+                    $this->errors .= "Ошибка добавления темы ".$theme['code']." - ". $theme['name']."<br>";
                     return false;
                 }
             }
@@ -204,7 +202,7 @@ class Admin extends Page
                 if($addQuest)
                     $count++;
                 else{
-                    self::$errors .= "Ошибка записи вопроса $num<br>";
+                    $this->errors .= "Ошибка записи вопроса $num<br>";
                     return false;
                 }
                 // перебор вариантов ответов
@@ -216,20 +214,20 @@ class Admin extends Page
                         $answer['text']
                     ];
                     if(!DBase::insertAddAnswer($value)){
-                        self::$errors .= "Ошибка записи ответа $key на вопрос $num<br>";
+                        $this->errors .= "Ошибка записи ответа $key на вопрос $num<br>";
                         return false;
                     }
                 }
             }
             if(!DBase::updateThemeCount($code,$count)){
-                self::$errors .= "Ошибка обновления темы<br>";
+                $this->errors .= "Ошибка обновления темы<br>";
                 return false;
             }
         }catch (Exception $e){
             echo "Ошибка записи в базу: ".$e;
         }
-        if(empty(self::$errors))
-            self::$message .= "Добавлено вопросов $count<br>";
+        if(empty($this->errors))
+            $this->message .= "Добавлено вопросов $count<br>";
         return $count;
     }
 
@@ -238,14 +236,14 @@ class Admin extends Page
      */
     protected function previewAddTest($preTest){
         if(empty($_POST['code'][0]) && empty($_POST['code'][1])){
-            self::$errors .= "Не указана тема для добавления тестов.<br>";
+            $this->errors .= "Не указана тема для добавления тестов.<br>";
         }else{
             $theme['code'] = $_SESSION['theme']['code'] = strip_tags($_POST['code'][0]);
             $theme['name'] = $_SESSION['theme']['name'] = strip_tags($_POST['name'][0]);
         }
         $tests = $_SESSION['tests'] = $this->convertQuests($preTest);
-        $errors = trim(self::$errors,"<br>");
-        $message = trim(self::$message,"<br>");
+        $errors = trim($this->errors,"<br>");
+        $message = trim($this->message,"<br>");
         include VIEW_DIR_ADMIN.'addtest_preview.php';
     }
     /**
@@ -262,22 +260,27 @@ class Admin extends Page
         }
         elseif (isset($_POST['code'][0])){
             $code = strip_tags($_POST['code'][0]);
-            $query = "SELECT * from quest INNER JOIN theme ON (quest.theme_code = theme.theme_code)
-                  INNER JOIN answ ON (quest.quest_id = answ.quest_id) WHERE theme.theme_code = ? AND quest_number > 0";
-            $tests = DBase::select($query,[$code]);
-            print_r($tests);
+//            $query = "SELECT * from quest INNER JOIN theme ON (quest.theme_code = theme.theme_code)
+//                  INNER JOIN answ ON (quest.quest_id = answ.quest_id) WHERE theme.theme_code = ? AND quest_number > 0";
+//            $tests = DBase::select($query,[$code]);
+            $page = new Test();
+            $tests = $page->getTest($code);
+            include VIEW_DIR_ADMIN."test_list.php";
+
+        //include VIEW_DIR_TEST."footer.php";
+//            print_r($tests);
             //$this->previewAddTest($tests);
         }
         elseif(isset($_POST['submit'])) {
             $this->insertAddTest();
-            $errors = trim(self::$errors,"<br>");
-            $message = trim(self::$message,"<br>");
+            $errors = trim($this->errors,"<br>");
+            $message = trim($this->message,"<br>");
             include VIEW_DIR_ADMIN.$template.'.php';
         }
         else
             {
-            $errors = trim(self::$errors,"<br>");
-            $message = trim(self::$message,"<br>");
+            $errors = trim($this->errors,"<br>");
+            $message = trim($this->message,"<br>");
             include VIEW_DIR_ADMIN.$template.'.php';
         }
        // echo " == $message ==";
