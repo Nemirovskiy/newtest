@@ -11,6 +11,11 @@ class DBase
     protected static $connect = null;
     private function __construct(){}
 
+    /**
+     *
+     */
+
+
     private static function baseConnect(){
         if(self::$connect === null){
             self::$connect = new PDO("mysql:host=localhost;dbname=".BD_NAME,BD_LOGIN,BD_PASS);
@@ -45,10 +50,11 @@ class DBase
      */
     public static function delAllFromTheme($theme){
         $query = "DELETE quest,answ FROM quest INNER JOIN answ ".
-            "WHERE quest.quest_id = answ.quest_id AND quest.theme_code = ?; ";
+            "WHERE quest.quest_id = answ.quest_id AND quest.theme_code = ?; ".
+            "UPDATE theme SET theme.theme_count = 0 WHERE theme.theme_code = ?;";
         $result = self::baseConnect()->prepare($query);
         //if($result->execute([$theme]))
-            return $result->execute([$theme]);
+            return $result->execute([$theme,$theme]);
         //else
         //    return false;
     }
