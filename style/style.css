@@ -29,11 +29,22 @@ input.inpt {
     input[type="checkbox"] + p {
 	    padding: 5px;
 	    border-radius: 5px;}    
-    li { padding: 5px;margin: 5px 0px; display: table;position: relative;}
+    li { /*padding: 5px;*/margin: 5px 0px; display: table;position: relative;}
     .r_otv {
 	    font-weight: bolder;
-	    border: 2px solid #0c0;    margin-left: 20px;
+	    border: 2px solid #0c0;
 	}
+    .otv{
+        margin-left: 20px;
+    }
+    .otv::after {
+        content: ">";
+        position: absolute;
+        left: -25px;
+        top: 2px;
+        color: #00c;
+        font-family: cursive;
+    }
     .m_otv {color: red;    margin-left: 20px;}
     .r_otv.m_otv {color: #0c0;}
 	.b_otv {color: red;}
@@ -51,7 +62,7 @@ input.inpt {
     top: 2px;
     color: #0c0;
 }
-	.active {    border: 1px solid;    padding: 3px;}
+	.nav_active {    border: 1px solid;    padding: 3px;}
 	body {    min-width: 200px;
 	    margin: 30px auto;
 	    font-size: 20px;
@@ -145,4 +156,12 @@ div#info {
 
 .cntr {
     text-align: center;
+}
+
+/***/
+.custom-file-label::after{
+    /*display: none;*/
+}
+label{
+    margin: 0;
 }
