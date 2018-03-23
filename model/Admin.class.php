@@ -33,7 +33,7 @@ class Admin extends Page
     /**
      * метод обработки текста в массив вопросов
      * @param array $arrayStr входящий массив строк
-     * @return array $quests - возвращаемый массив вопросов
+     * @return array|bool $quests - возвращаемый массив вопросов
      *
      */
     protected function convertQuests($arrayStr){
@@ -118,18 +118,25 @@ class Admin extends Page
         /**
          * проверка подсчета кол-ва вопросов - ответов - верных ответов
          */
-        if($countQuest !== $countAnswer){
+        if($countQuest < 1){
+            $this->errors .= "Вопросы в тексте не найдены<br>";
+            return false;
+        }
+        elseif($countQuest !== $countAnswer){
             $this->errors .= "Количество вопросов не соответствует ответам "
                 ."(на каждый вопрос должен быть хотябы один ответ)<br>";
+            return false;
         }
         if($countAnswer !== $countRight){
             $this->errors .= "Количество правильных ответов не соответствует ".
                 "количеству ответов (должен быть хотя бы один верный ответ)<br>";
+            return false;
         }
         if(count($diffAnswer)>0){
             $this->errors .= "Указанный верный ответ в вопросе ".
                 implode($diffAnswer," ") ." не соответствует ".
                 "количеству ответов (должен быть не больше, чем вариантов ответа)<br>";
+            return false;
         }
         $this->message .= "Будет добавленно $countQuest вопросов.<br>";
         return $quests;
@@ -192,7 +199,7 @@ class Admin extends Page
                     return false;
                 }
             }
-            foreach ($_SESSION['tests'] as $tests){
+            foreach ($_SESSION['addTests'] as $tests){
                 $num = $tests['number'];
                 $value = [$code, $tests['number'], $tests['quest']];
                 // вызываем добавление вопроса
@@ -232,19 +239,109 @@ class Admin extends Page
     }
 
     /**
+     * метод проверки наличия темы для добавления вопросов
+     * @return bool
+     */
+    private function checkAddTheme(){
+        // если выбрано добавление темы
+        if(strip_tags($_POST['addCode']) === 'new'){
+            if(empty($_POST['newCode']) && empty($_POST['newName'])){
+                $this->errors .= "Не указана новая тема для добавления тестов.<br>";
+                return false;
+            }
+            elseif(array_key_exists(strip_tags($_POST['newCode']), Test::getThemeList() )){
+                $this->errors .= "Нельзя указать для новой темы код существующей.<br>";
+                return false;
+            }else{
+                $theme['code'] = $_SESSION['theme']['code'] = strip_tags($_POST['newCode']);
+                $theme['name'] = $_SESSION['theme']['name'] = strip_tags($_POST['newName']);
+            }
+        }elseif (empty($_POST['addCode'])){
+            $this->errors .= "Не указана тема для добавления тестов.<br>";
+            return false;
+        }else{
+            $theme['code'] = $_SESSION['theme']['code'] = strip_tags($_POST['addCode']);
+            $theme['name'] = $_SESSION['theme']['name'] = Test::getThemeList()[$theme['code']]['text'];
+        }
+        return true;
+    }
+    /**
      * метод показа загруженных тестов для добавления в базу
      */
-    protected function previewAddTest($preTest){
-        if(empty($_POST['code'][0]) && empty($_POST['code'][1])){
-            $this->errors .= "Не указана тема для добавления тестов.<br>";
-        }else{
-            $theme['code'] = $_SESSION['theme']['code'] = strip_tags($_POST['code'][0]);
-            $theme['name'] = $_SESSION['theme']['name'] = strip_tags($_POST['name'][0]);
+    /*protected function previewAddTest($preTest){
+        $template = 'addtest';
+        if($this->checkAddTheme()){
+            $_SESSION['addTests'] = $this->convertQuests($preTest);
+            foreach ($_SESSION as $key=>$item){
+                $$key = $item;
+            }
+            $template .= '_preview';
         }
-        $tests = $_SESSION['tests'] = $this->convertQuests($preTest);
+
         $errors = trim($this->errors,"<br>");
         $message = trim($this->message,"<br>");
-        include VIEW_DIR_ADMIN.'addtest_preview.php';
+        include VIEW_DIR_ADMIN.$template.'.php';
+    }*/
+    private function buildAddTest(){
+        $theme = Test::getThemeList();
+        return ['theme'=>$theme];
+    }
+
+    private function buildPreviewAddTest(){
+        $preTest = $this->prepareQuests();
+        $tests = $this->convertQuests($preTest);
+        if($tests){
+            $_SESSION['addTests'] = $tests;
+            return $_SESSION;
+        }
+        //$this->errors .= "Нет тестов для добавления<br>";
+        return false;
+    }
+    private function buildAddTestBD(){
+        echo "<pre>";
+        print_r($_SESSION);
+        var_dump($this->insertAddTest());
+        echo "</pre>";
+    }
+    private function buildAdmin(){
+        return [];
+    }
+    private function separation(){
+        /**
+         *
+         */
+        // код подготовки для проверки
+
+        // проверяем есть ли пост?
+        if(!empty($_POST)){
+            // если есть указанная тема
+            // проверим есть ли текст/файл
+            if(!empty($_POST['addCode'])){
+                if($this->checkAddTheme() && $this->prepareQuests()){
+                    // покажем загруженные тесты и спросим добавить?
+                    // отобразить список тестов
+                    return 'previewAddTest';
+                }else{
+                    //$this->errors .= "Не указан текст для добавления тестов.<br>";
+                    return false;
+                }
+            }
+            // если нет файла - покажем ошибку
+            if (isset($_SESSION['addTests']) && isset($_POST['submit'])){
+                // нажата кнопка добавить
+                // добавим в БД
+                if(empty($_SESSION['addTests'])){
+                    $this->errors .= "Нет текста для добавления тестов.<br>";
+                    return false;
+                }
+                return 'addTestBD';
+            }
+        }
+        elseif(0){
+            //
+        }
+        // если условия не подошли - укажем код текущей страницы
+        return $this->code;
     }
     /**
      * метод подготовки отображения основной части станицы
@@ -252,6 +349,41 @@ class Admin extends Page
      */
     protected function prepareBody($template)
     {
+        // список ситуационных страниц
+        $pages = [
+          'previewAddTest'=>'addtest_preview',
+          'addTest'=>'addtest',
+          'addTestBD'=>'addtest'
+        ];
+        $case = $this->separation();
+        if($case === false) $case = $this->code;
+        // страница отображения
+        // - если есть в ситуационных страницах
+        // - если нет - то по коду текущей страницы
+        $page = isset($pages[$case]) ? $pages[$case] : $this->code;
+        echo "<pre>";
+        print_r($case);
+        echo "</pre>";
+        $execute = 'build'.ucfirst($case);
+        $content = $this->$execute();
+        // загружаем сообщения и ошибки
+        $errors = trim($this->errors,"<br>");
+        $message = trim($this->message,"<br>");
+        // если контент вернул ложь
+        // - значит ошибка,
+        // отобразить текущую страницу
+        if($content === false){
+            $execute = 'build'.ucfirst($this->code);
+            $content = $this->$execute();
+            $page = $this->code;
+        }
+        foreach ($content as $key=>$item){
+            $$key = $item;
+        }
+        print_r($content);
+        echo "</pre>";
+        include VIEW_DIR_ADMIN.$page.'.php';
+        /*
         $theme = Test::getThemeList();
         $preTest = $this->prepareQuests();
 
@@ -260,16 +392,9 @@ class Admin extends Page
         }
         elseif (isset($_POST['code'][0])){
             $code = strip_tags($_POST['code'][0]);
-//            $query = "SELECT * from quest INNER JOIN theme ON (quest.theme_code = theme.theme_code)
-//                  INNER JOIN answ ON (quest.quest_id = answ.quest_id) WHERE theme.theme_code = ? AND quest_number > 0";
-//            $tests = DBase::select($query,[$code]);
             $page = new Test();
             $tests = $page->getTest($code);
             include VIEW_DIR_ADMIN."test_list.php";
-
-        //include VIEW_DIR_TEST."footer.php";
-//            print_r($tests);
-            //$this->previewAddTest($tests);
         }
         elseif(isset($_POST['submit'])) {
             $this->insertAddTest();
@@ -282,7 +407,7 @@ class Admin extends Page
             $errors = trim($this->errors,"<br>");
             $message = trim($this->message,"<br>");
             include VIEW_DIR_ADMIN.$template.'.php';
-        }
+        }*/
        // echo " == $message ==";
     }
 
