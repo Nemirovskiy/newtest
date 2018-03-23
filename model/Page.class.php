@@ -104,4 +104,22 @@ class Page extends Model
         // подключим низ страницы
         include VIEW_DIR_INCLUDE.'footer.php';
 	}
+	public function renderJson($code)
+	{
+	    // проверяем на корректность адрес
+	    $valid = $this->validAdress($code);
+	    // подготавливаем голову
+        //$this->prepareHead($code);
+        // если адрес корректный - подготовим контент
+        if($valid){
+            //$this->prepareBody($code);
+        }
+        // иначе - отобразим старницу ошибки
+        else {
+            //include VIEW_DIR_ERORS.'404.php';
+            echo json_encode("error: 404");
+        }
+        // подключим низ страницы
+        //include VIEW_DIR_INCLUDE.'footer.php';
+	}
 }

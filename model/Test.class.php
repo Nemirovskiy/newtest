@@ -5,7 +5,7 @@
 class Test extends Page
 {
 	public static  $list    = null; 	// Список тем
-	public static  $theme   = []  ; 	// Тема
+	public static  $theme   = ''  ; 	// Тема
 	public static  $num     = ''  ; 	// номер вопроса
 	public static  $quest   = ''  ; 	// Текст вопроса
 	public static  $answers = []  ; 	// ответы
@@ -70,7 +70,7 @@ class Test extends Page
             if($this->checkAnswer($theme)){
                 // ответ верный
                 // показать, что ответ верный
-                $this->message = 'right';
+                $this->message = 'Верно!';
             }
             else{
                 // ответ не верный
@@ -102,6 +102,7 @@ class Test extends Page
     }
     private function buildWrong(){
         $result = $_SESSION['curent'];
+        $result['wrong'] = 'true';
         $result['message'] = $this->message;
         $result['errors'] = $this->errors;
         return $result;
@@ -124,6 +125,16 @@ class Test extends Page
      * Метод подготовки основной части страницы
      * @param string $testTheme - тема теста
      */
+
+    public function renderJson($code){
+        $this->code = $code;
+        $this->validAdress($code);
+//        $content = $this->getTest($code,$_POST['number']);
+        $template = $this->separation();
+        $execute = 'build'.ucfirst($template);
+        $content = $this->$execute();
+        echo json_encode($content);
+    }
     protected function prepareBody($testTheme)
     {
         $template = $this->separation();
