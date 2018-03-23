@@ -87,6 +87,9 @@ class Test extends Page
         // показать новый вопрос
         return 'test';
     }
+    private function buildNotest(){
+        return [];
+    }
     private function buildTest(){
         $_SESSION['curent']['code'] = $code = $this->code;
         $test = $this->getTest($code,$this->generateNumberQuest());
