@@ -17,7 +17,7 @@
             </li>
         <? endforeach; ?>
     </ul>
-    <div class='cntr'>
-        <input type='submit' value='Ok' style="padding: 10px 100px;">
+    <div class="col-sm-8 row mx-auto justify-content-center" >
+        <input class="btn m-2 col-sm-5 btn-outline-primary" type='submit' value='Ok'>
     </div>
 </form>

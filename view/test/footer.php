@@ -1,6 +1,6 @@
 <div class='cntr'><br>
     <form action="post" method="post">
-        <input type="submit" name="reset" value="Сброс">
+        <input class="btn m-2 col-sm-2 btn-outline-warning btn-sm" type="submit" name="reset" value="Сброс">
     </form>
     <br>
     <form action="post"  method="post">
