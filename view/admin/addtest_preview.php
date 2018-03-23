@@ -19,9 +19,11 @@
         <? endforeach;?>
     <? endforeach; ?>
 </ul>
-<form method="POST">
+<form class="col-sm-8 row mx-auto justify-content-center" method="POST">
     <? if(empty($errors)): ?>
-        <button name="submit">Будем добавлять</button>
+        <button class="btn m-2 col-sm-5 btn-success" name="submit">Добавить</button>
     <?endif;?>
-    <button name="reset">Изменить</button>
+    <button class="btn m-2 col-sm-5 btn-warning" name="reset">Изменить</button>
+
 </form>
+
