@@ -1,14 +1,14 @@
 <?
 /**
-*	
-*/
+ *
+ */
 class Test extends Page
 {
-	public static  $list    = null; 	// Список тем
-	public static  $theme   = ''  ; 	// Тема
-	public static  $num     = ''  ; 	// номер вопроса
-	public static  $quest   = ''  ; 	// Текст вопроса
-	public static  $answers = []  ; 	// ответы
+    public static  $list    = null; 	// Список тем
+    public static  $theme   = ''  ; 	// Тема
+    public static  $num     = ''  ; 	// номер вопроса
+    public static  $quest   = ''  ; 	// Текст вопроса
+    public static  $answers = []  ; 	// ответы
 
     private function checkAnswer($theme){
         /**
