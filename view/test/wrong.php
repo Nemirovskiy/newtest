@@ -6,12 +6,12 @@
 <form action="" id="main" method="post">
     <h2>Вопрос № <?=$number?></h2>
     <h3><?=$quest?></h3>
-    <ul>
+    <ul class="answerList">
         <? foreach($answers as $answer): ?>
             <li class="<?
-            if($answer['right']) echo "r_otv";
-            if($answer['check'] === true) echo " m_otv";
-            else echo " otv";
+            if($answer['check'] === true) echo " answerCheck";
+            if($answer['right']) echo " text-success answerRight";
+            //else echo " otv";
             ?>">
                 <p><?=$answer['text']?></p>
             </li>
