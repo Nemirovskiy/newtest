@@ -13,7 +13,7 @@ class Admin extends Page
      */
     protected static $regexpQuest = "#^[\s|\t]*[\#|№]+[\s|\t]*([0-9]*)(.*)$#u";
     protected static $regexpAnswer = "#^[\s|\t]*([a-zA-Zа-яА-ЯёЁ\s]+)\)(.+)#u";
-    protected static $regexpRight = "#^[\s|\t]*([0-9]+)[\s\t]*([а-яА-Яa-zA-Z|,\s]{1,10})$#u";
+    protected static $regexpRight = "#^[\s|\t]*([0-9]+)[\s\t]*([а-яА-Яa-zA-Z,\s]+)$#u";
     /**
      * метод преобразования букв в порядковые номера
      * @param string $liter - входящий символ или строка
@@ -366,7 +366,7 @@ class Admin extends Page
         // - если нет - то по коду текущей страницы
         $page = isset($pages[$case]) ? $pages[$case] : $this->code;
         echo "<pre>";
-        print_r($case);
+        //print_r($case);
         echo "</pre>";
         $execute = 'build'.ucfirst($case);
         $content = $this->$execute();
@@ -384,7 +384,7 @@ class Admin extends Page
         foreach ($content as $key=>$item){
             $$key = $item;
         }
-        print_r($content);
+        //print_r($content);
         echo "</pre>";
         include VIEW_DIR_ADMIN.$page.'.php';
         /*
