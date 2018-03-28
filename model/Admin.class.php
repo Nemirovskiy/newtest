@@ -148,14 +148,17 @@ class Admin extends Page
      * @return array|bool - массив необработанных строк (вопросы, ответы)
      */
     protected function prepareQuests(){
+        $text = '';
         if(!empty($_FILES['file']['tmp_name']) || $_FILES['file']['type'] === "text/plain"){
             $text = file_get_contents($_FILES['file']['tmp_name']);
-            return explode("\n",strip_tags($text));
         }
         elseif(!empty($_POST['text'])){
-            return explode("\n",strip_tags($_POST['text']));
+            $text = $_POST['text'];
         }
-        return false;
+        // уберем теги и добавим неразрывный пробел перед цифрой
+        $text = preg_replace("#([\S|\T])[\s|\t](\d)#","$1&nbsp;$2",strip_tags($text));
+        $text = ($text === '') ? false : explode("\n",$text);
+        return $text;
     }
 
     /**
