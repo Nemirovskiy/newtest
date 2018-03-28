@@ -31,52 +31,60 @@
 <?endif;?>
 <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item">
-        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#addtest" role="tab" aria-controls="home" aria-selected="true">Добавление тестов</a>
+        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#addtest" role="tab" aria-controls="home" aria-selected="true">Добавление</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Profile</a>
+        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Редактор</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
+        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Страницы</a>
     </li>
 </ul>
 <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="addtest" role="tabpanel" aria-labelledby="home-tab">
         <form class="form-group row mt-3" method="POST" enctype="multipart/form-data" id="addForm">
-            <label class="col-sm-2 col-form-label" for="inputTheme">Тема</label>
-            <select id="inputTheme" name="addCode" class="form-control col-sm-3">
-                <option selected value="new">Новая</option>
-                <? foreach ($theme as $item): ?>
-                    <option value="<?=$item['code']?>"><?=$item['text']?></option>
-                <? endforeach; ?>
-            </select>
-            <div id="newTheme" class="col-sm-7 row">
-                <div class="col-sm-5 col">
-                    <input type="text" class="form-control" name="newCode" id="newThemeCode" placeholder="код темы">
-                </div>
-                <div class="col-sm-7 col">
-                    <input type="text" class="form-control" name="newName" id="newThemeName" placeholder="Название темы">
+            <div class="col-sm-12 row">
+                <label class="col-sm-2 col-form-label" for="inputTheme">Тема</label>
+                <select id="inputTheme" name="addCode" class="form-control col-sm-3">
+                    <option selected value="new">Новая</option>
+                    <? foreach ($theme as $item): ?>
+                        <option value="<?=$item['code']?>"><?=$item['text']?></option>
+                    <? endforeach; ?>
+                </select>
+                <div id="newTheme" class="col-sm-7 row">
+                    <!--                <div class="">-->
+                    <input type="text" class="form-control col-sm-5 ml-2" name="newCode" id="newThemeCode" placeholder="код темы">
+                    <!--                </div>-->
+                    <!--                <div class="">-->
+                    <input type="text" class="form-control col-sm-6 ml-2" name="newName" id="newThemeName" placeholder="Название темы">
+                    <!--                </div>-->
                 </div>
             </div>
-            <div class="col-sm-12">
+
+            <div class="col-sm-12 mt-2">
                 <p class="textNewTheme mb-1 text-center" id="textNewTeme"></p>
             </div>
-            <div class="col-sm-8 row mt-0 mb-2 mx-auto">
-                <div class="col-sm">
-                    <label class="btn btn-outline-primary" for="buttonFile">Выберите файл</label>
-                    <input style="display: none;" type="file" name="file"  accept="text/plain" id="buttonFile">
-                </div>
-                <div class="col-sm">
-                    <input type="button" id="buttonText" name="onText" class="btn btn-outline-primary" value="Добавить текст">
-                </div>
+            <div class="col-sm-8 row mt-0 mb-2 mx-auto justify-content-center">
+                <label class="btn col-sm-5 mr-2 btn-outline-primary" for="buttonFile">Выбрать файл</label>
+                <input style="display: none;" type="file" name="file"  accept="text/plain" id="buttonFile">
+                <input type="button" id="buttonText" name="onText"
+                       class="btn col-sm-5 ml-2 btn-outline-primary" value="Вставить текст">
             </div>
             <div class="col-sm-12">
                 <p class="textNewTheme mb-1 text-center" id="textFileTeme"></p>
-                <textarea disabled style="display: none" style="overflow-x: hidden; overflow-y: visible;" name="text" id="textArea" class="form-control" ></textarea>
+                <textarea disabled  name="text" id="textArea" class="form-control addText"
+                          placeholder="<?="Образец:\n#1 ОСНОВОЙ АСЕПТИКИ ЯВЛЯЕТСЯ:\nа)"
+                          ." дезинфекция;\nб) предстерилизационная очистка;\n"
+                          ."в) стерилизация\n\n№2 ПОСЛЕ СНЯТИЯ ПЕРЧАТОК НЕОБХОДИМО:\n".
+                          "а) провести гигиеническую обработку рук;\n".
+                          "б) сполоснуть руки под проточной водой;\n".
+                          "\n1 а\n2 а"
+
+                          ?>"></textarea>
             </div>
             <div class="col-sm-10 row  mx-auto mt-2">
                 <input type="submit" id="buttonAddTest" name="addTest"
-                       class="btn btn-outline-primary col-sm-12" value="Добавить тест">
+                       class="btn btn-outline-primary col-sm-6 mx-auto" value="Добавить">
             </div>
         </form>
 
@@ -112,7 +120,7 @@
             $('#textArea').toggle();
             if($('#textArea').is(':hidden')){
                 $('#textArea').prop('disabled',true);
-                $('#buttonText').val('Добавить текст');
+                $('#buttonText').val('Вставить текст');
                 $('#buttonFile').prop('disabled',false);
                 $('[for=\'buttonFile\']').removeClass('disabled');
             }
@@ -126,21 +134,23 @@
         });
         $('#buttonFile').on('change',function () {
             $('#textFileTeme').text('Вставим тесты из файла ' + $(this).val().split("\\").pop());
+            $(this).removeClass('btn-outline-danger');
         });
+
         $('#addForm').on('submit',function (e) {
             var flag = true;
             $('#addForm input, #addForm select, #addForm textarea')
                 .not(':disabled, [type=\'submit\'], [type=\'submit\']').each(function () {
                 if($(this).val().length < 1){
                     $(this).addClass('is-invalid');
-                    $(this).prev('label').addClass('invalid-feedback');
+                    $(this).prev('label').addClass('btn-outline-danger');
                 }else{
                     $(this).removeClass('is-invalid');
-                    $(this).prev('label').removeClass('invalid-feedback');
+                    $(this).prev('label').removeClass('btn-outline-danger');
                 }
                 if($(this).val().length < 1 && flag)
                     flag = false;
-            })
+            });
             if(!flag)
                 e.preventDefault();
         })
