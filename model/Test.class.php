@@ -15,18 +15,18 @@ class Test extends Page
          * $_SESSION['used'][$theme][]  - массив отвеченных вопросов в теме
          * $_SESSION['right'][$theme][] - массив правильных ответов в теме
          */
-            $answer = $_POST[$theme];
-            $right = $_SESSION["curent"]["right"];
-            foreach ($answer as $item){
-                $_SESSION["curent"]["answers"][$item - 1]['check'] = true;
-            }
-            $_SESSION['used'][$theme][] = $_SESSION['curent']['number'];
-            if(implode(",",$answer) === implode(",",$right)){
-                $_SESSION['right'][$theme][] = $_SESSION['curent']['number'];
-                return true;
-            }
-            else
-                return false;
+        $answer = $_POST[$theme];
+        $right = $_SESSION["curent"]["right"];
+        foreach ($answer as $item){
+            $_SESSION["curent"]["answers"][$item - 1]['check'] = true;
+        }
+        $_SESSION['used'][$theme][] = $_SESSION['curent']['number'];
+        if(implode(",",$answer) === implode(",",$right)){
+            $_SESSION['right'][$theme][] = $_SESSION['curent']['number'];
+            return true;
+        }
+        else
+            return false;
     }
 
     /**
