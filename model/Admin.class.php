@@ -235,9 +235,11 @@ class Admin extends Page
         }catch (Exception $e){
             echo "Ошибка записи в базу: ".$e;
         }
-        if(empty($this->errors))
+        if(empty($this->errors)){
             $this->message .= "Добавлено вопросов $count<br>";
-        return $count;
+            unset($_SESSION['addTests']);
+        }
+        return [];
     }
 
     /**
@@ -374,7 +376,7 @@ class Admin extends Page
         // если контент вернул ложь
         // - значит ошибка,
         // отобразить текущую страницу
-        if($content === false){
+        if($content === false || empty($content)){
             $execute = 'build'.ucfirst($this->code);
             $content = $this->$execute();
             $page = $this->code;
