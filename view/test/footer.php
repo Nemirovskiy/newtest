@@ -36,16 +36,3 @@
     <a href='.?donate'>поддержать автора материально</a>
     <br>
 </div>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-<script>
-$(function() {
-  $('#submit').prop('disabled', true);
-  $('.inpt').change(function() {
-    if($('.inpt:checked').length > 0) {            
-      $('#submit').prop('disabled', false);
-    }
-	else
-	{$('#submit').prop('disabled', true);}
-  });
-});
-</script>
