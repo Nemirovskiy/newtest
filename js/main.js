@@ -47,6 +47,22 @@ function generateResult(e){
     $('#submit').prop('disabled', false);
 }
 
+//
+function errorSubmit(d,e) {
+    if(e !== 'parserror'){
+        $('#main').removeClass('wait');
+        $('#submit').val('Ок').prop('disabled',false);
+        $('<div/>',{
+            'class': 'alert alert-danger',
+            'role': 'alert'
+        }).html('Ошибка соединения с сайтом<br>Попробуйте позже.').appendTo('#message');
+        setTimeout(function () {
+            $(".testMessage .alert").alert('close');
+        }, 5000);
+    }
+}
+
+
 // функция обработки ответа сервера на нажатие кнопки ответить
 function successSubmit(s) {
     showMessage(s);
@@ -54,7 +70,6 @@ function successSubmit(s) {
     $('#submit').val('Ок');
     if(s.wrong == 'true'){
         generateWrong(s);
-        //alert(99);
     }else if(s.number > 0){
         generateNew(s);
     }else{
@@ -98,12 +113,12 @@ $(function () {
             "ajax": "ajax",
             "reset": code
         };
-            $.ajax({
-                method: 'POST',
-                dataType: 'json',
-                data: data,
-                success: successSubmit
-            })
+        $.ajax({
+            method: 'POST',
+            dataType: 'json',
+            data: data,
+            success: successSubmit
+        })
     });
 
     // проверяем нажатие на ответы, если есть хоть
@@ -138,10 +153,9 @@ $(function () {
                 method: 'POST',
                 dataType: 'json',
                 data: data,
-                timeout: function(){
-                    alert('timeout');
-                },
-                success: successSubmit
+                timeout: 5000,
+                success: successSubmit,
+                error: errorSubmit
             })
     });
 

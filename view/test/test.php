@@ -25,7 +25,7 @@
         </div>
     </div>
     <div class="col-sm-8 row mx-auto justify-content-center" >
-        <input id='submit' class="btn m-2 col-5 col-sm-5 btn-outline-primary" disabled type='submit' value='Ok'>
+        <input id='submit' class="btn m-2 col-5 col-sm-5 btn-outline-primary" type='submit' value='Ok'>
     </div>
 </form>
 <script>

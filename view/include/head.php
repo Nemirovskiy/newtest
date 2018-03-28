@@ -15,16 +15,25 @@
 </head>
 <body>
 	<header>
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <noscript>
+            <form class="alert text-center alert-warning alert-dismissible fade show" >
+                <button type="submit" name="noJavaScript" class="close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                    <strong>Ваш браузер работает без JavaScript</strong><br>
+                    Функционал сайта будет ограничен.
+            </form>
+        </noscript>
+        <form method="POST" class="alert alert-warning alert-dismissible fade show" role="alert">
             <h1>Сайт в разработке!</h1>
             Тесты загружены для проверки работы сайта.
             <br>
             Могут возникать ошибки. <br>
             Продолжая пользоваться сайтом, Вы соглашаетесь с этим или покиньте сайт
-            <button type="button" class="btn btn-outline-secondary" data-dismiss="alert" aria-label="Close">
+            <button type="submit" name="close" class="btn btn-outline-secondary" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">Согласен.</span>
             </button>
-        </div>
+        </form>
 		<nav>
 		<? foreach($nav as $link):?>
 			<a <?if($link['active']) echo 'class="nav_active"';?> href="?t=<?=$link['code']?>"><?=$link['title']?></a>
