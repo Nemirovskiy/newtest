@@ -146,8 +146,16 @@ class Test extends Page
         $this->validAdress($code);
 //        $content = $this->getTest($code,$_POST['number']);
         $template = $this->separation();
-        $execute = 'build'.ucfirst($template);
-        $content = $this->$execute();
+        if($template === 'ajax'){
+
+        }else{
+            $execute = 'build'.ucfirst($template);
+            $content = $this->$execute();
+            $content['used'] = $_SESSION['used'];
+        }
+        $content['message'] = $this->message;
+        $content['errors'] = $this->errors;
+        $content['code'] = $this->code;
         echo json_encode($content);
     }
     protected function prepareBody($testTheme)
@@ -155,14 +163,17 @@ class Test extends Page
         $template = $this->separation();
         $execute = 'build'.ucfirst($template);
         $content = $this->$execute();
+        $code = $this->code;
         foreach ($content as $key=>$item){
             $$key = $item;
         }
         //$_SESSION["curent"] = [];
+        $message = $this->message;
+        $errors = $this->errors;
         include VIEW_DIR_TEST.$template.'.php';
         echo "<pre>";
         //echo json_encode($content);
-        print_r($content);
+        //print_r($content);
         echo "</pre>";
 
         include VIEW_DIR_TEST."footer.php";
