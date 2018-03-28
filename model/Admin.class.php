@@ -189,7 +189,6 @@ class Admin extends Page
                 }
             }
             else{
-                echo "<br>добавляем тему $code<br>";
                 $theme = [
                     'code'=>$code,
                     'name'=>$_SESSION['theme']['name'],
