@@ -60,6 +60,7 @@ class Test extends Page
         $theme = $this->code;
         $count = self::getThemeList()[$theme]['count'];
         $answer = !empty($_POST[$theme]);
+        $reset = !empty($_POST['reset']);
 
         if($count < 1){
             // вопросов в теме ещё нет
@@ -79,6 +80,14 @@ class Test extends Page
                 return 'wrong';
             }
         }
+        elseif ($reset){
+            $this->message = 'Статистика темы '.self::getThemeList()[$this->code]['text'].' сброшена!';
+            $_SESSION['used'][$this->code] = [];
+            //return 'reset';
+            if(!empty($_POST['ajax'])){
+                return 'test';
+            }
+        }
         if(count($_SESSION['used'][$theme]) == $count){
             // отвечены все вопросы / ответ верный и вопросов больше нет
             // показать статистику
@@ -86,6 +95,11 @@ class Test extends Page
         }
         // показать новый вопрос
         return 'test';
+    }
+
+    private function buildReset(){
+
+        return [];
     }
     private function buildNotest(){
         return [];
@@ -105,6 +119,7 @@ class Test extends Page
         $result['wrong'] = 'true';
         $result['message'] = $this->message;
         $result['errors'] = $this->errors;
+        $result['user'] = $this->errors;
         return $result;
     }
 
