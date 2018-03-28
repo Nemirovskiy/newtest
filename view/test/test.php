@@ -1,25 +1,31 @@
 <h1>Вопросы по теме <?=$theme?></h1>
-<div class="message" id="message">
-    <?=$message?>
+<div id="message" class="testMessage">
+    <?if(!empty($message)):?>
+        <div class="alert alert-primary" role="alert" >
+            <?=$message?>
+        </div>
+    <?endif;?>
 </div>
-<form action="" id="main" method="post">
-    <h2>Вопрос № <span id="number"><?=$number?></span> </h2>
-    <h3 id="quest"><?=$quest?></h3>
-    <ul id="answer">
-        <? foreach($answers as $answer): ?>
-            <li>
-                <label>
-                    <input class="inpt"
+
+
+<form action="" method="post">
+    <div id="main" class="col-sm-12" >
+        <h2>Вопрос № <span id="number"><?=$number?></span> </h2>
+        <h3 id="quest"><?=$quest?></h3>
+        <div class="col-sm">
+            <? foreach($answers as $answer): ?>
+                <label class="row align-items-center">
+                    <input class="inpt "
                            name="<?=$code?>[]"
                            type='checkbox'
                            value="<?=$answer['order']?>">
-                    <p><?=$answer['text']?></p>
+                    <p class="col"><?=$answer['text']?></p>
                 </label>
-            </li>
-        <? endforeach; ?>
-    </ul>
+            <? endforeach; ?>
+        </div>
+    </div>
     <div class="col-sm-8 row mx-auto justify-content-center" >
-        <input id='submit' class="btn m-2 col-sm-5 btn-outline-primary" disabled type='submit' value='Ok'>
+        <input id='submit' class="btn m-2 col-5 col-sm-5 btn-outline-primary" disabled type='submit' value='Ok'>
     </div>
 </form>
 <script>
