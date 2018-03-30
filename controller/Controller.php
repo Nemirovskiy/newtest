@@ -8,11 +8,12 @@ require_once 'controller/autoload.php';
 
 
 // метод определения адрес - шаблон или тема теста
-$url = Controller::urlDetecter();
+$code = Controller::urlDetector();
+$class = $code.'Controller';
 //print_r($url);
 // создаем объект страницу или тест
-$page = new $url[0];
-
+$page = new $class;
+$page->render();
 // передаем данные представлению
 /**
  * 0. Определяем класс страницы
@@ -26,15 +27,16 @@ $page = new $url[0];
  * 3. Обрабатываем событие
  * $result = $page->$case()
  * 3. Формируем массив контента
+ *
  * $content = $page->getContent()
  *
  *
  */
 
-if(empty($_POST['ajax'])){
-    $page->renderHtml($url[1]);
-}else{
-    $page->renderJson($url[1]);
-}
+//if(empty($_POST['ajax'])){
+//    $page->renderHtml($url[1]);
+//}else{
+//    $page->renderJson($url[1]);
+//}
 ?>
 

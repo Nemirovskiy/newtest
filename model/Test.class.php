@@ -5,16 +5,19 @@
 class Test extends Page
 {
     public static  $list    = null; 	// Список тем
-    public static  $theme   = ''  ; 	// Тема
     public static  $num     = ''  ; 	// номер вопроса
     public static  $quest   = ''  ; 	// Текст вопроса
     public static  $answers = []  ; 	// ответы
+    public static  $wrong = false ; 	// ошибочный ответ
 
-    private function checkAnswer($theme){
+    public function checkAnswer(){
         /**
          * $_SESSION['used'][$theme][]  - массив отвеченных вопросов в теме
          * $_SESSION['right'][$theme][] - массив правильных ответов в теме
          */
+        //echo "\nF:".__FUNCTION__;
+
+        $theme = $this->code;//echo "\nt:".$theme;
         $answer = $_POST[$theme];
         $right = $_SESSION["curent"]["right"];
         foreach ($answer as $item){
@@ -48,63 +51,35 @@ class Test extends Page
         return $number;
     }
 
-    /**
-     * @return string метод оформления
-     *
-     */
-    private function separation(){
-        /**
-         *
-         */
-        // код подготовки выражений для проверки
-        $theme = $this->code;
-        $count = self::getThemeList()[$theme]['count'];
-        $answer = !empty($_POST[$theme]);
-        $reset = !empty($_POST['reset']);
-
-        if($count < 1){
-            // вопросов в теме ещё нет
-            return 'notest';
-        }
-        elseif($answer){
-            // если есть ответ
-            if($this->checkAnswer($theme)){
-                // ответ верный
-                // показать, что ответ верный
-                $this->message = 'Верно!';
-            }
-            else{
-                // ответ не верный
-                // показать ответ
-                $this->message = 'Не верно!';
-                return 'wrong';
-            }
-        }
-        elseif ($reset){
-            $this->message = 'Статистика темы '.self::getThemeList()[$this->code]['text'].' сброшена!';
-            $_SESSION['used'][$this->code] = [];
-            //return 'reset';
-            if(!empty($_POST['ajax'])){
-                return 'test';
-            }
-        }
-        if(count($_SESSION['used'][$theme]) == $count){
-            // отвечены все вопросы / ответ верный и вопросов больше нет
-            // показать статистику
-            return 'result';
-        }
-        // показать новый вопрос
-        return 'test';
-    }
-
     private function buildReset(){
 
         return [];
     }
-    private function buildNotest(){
+    public function getContentNotest(){
         return [];
     }
-    private function buildTest(){
+    public function getContentCheck(){
+        if($this->checkAnswer()){
+            // ответ верный
+            // показать, что ответ верный
+//                    $result = $this->getContentTest();
+//                    $result['message'] = 'Верно!';
+            return 'test';
+        }
+        else{
+            // ответ не верный
+            // показать ответ
+            //self::$wrong = true;
+            //$result = $this->getContentWrong();
+            return 'wrong';
+        }
+        echo __METHOD__."<br>";
+        return [];
+    }
+
+    public function getContentTest(){
+        // получим данные о страницы от родителя
+        $head = parent::getContentPage();
         $_SESSION['curent']['code'] = $code = $this->code;
         $test = $this->getTest($code,$this->generateNumberQuest());
         $_SESSION['curent'] = $test;
@@ -112,9 +87,9 @@ class Test extends Page
         $test['right'] = '';
         $test['message'] = $this->message;
         $test['errors'] = $this->errors;
-        return $test;
+        return array_merge($test,$head);
     }
-    private function buildWrong(){
+    public function getContentWrong(){
         $result = $_SESSION['curent'];
         $result['wrong'] = 'true';
         $result['message'] = $this->message;
@@ -141,7 +116,7 @@ class Test extends Page
      * @param string $testTheme - тема теста
      */
 
-    public function renderJson($code){
+    public function renderJson($code){/*
         $this->code = $code;
         $this->validAdress($code);
 //        $content = $this->getTest($code,$_POST['number']);
@@ -157,9 +132,9 @@ class Test extends Page
         $content['errors'] = $this->errors;
         $content['code'] = $this->code;
         echo json_encode($content);
-    }
+    */}
     protected function prepareBody($testTheme)
-    {
+    {/*
         $template = $this->separation();
         $execute = 'build'.ucfirst($template);
         $content = $this->$execute();
@@ -177,7 +152,7 @@ class Test extends Page
         echo "</pre>";
 
         include VIEW_DIR_TEST."footer.php";
-    }
+    */}
 
     /**
      * Метод получения вопроса и ответа из указанной темы и указанного номера вопроса

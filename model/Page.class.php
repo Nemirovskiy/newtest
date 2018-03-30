@@ -17,15 +17,20 @@ class Page extends Model
 	protected $title='Тестирование - Главная'; // заголовок
 	private $nav=[];	 // навигация
 	protected $code='';	 // символьное имя - код страницы
-    private $list= null;	 // список всех страниц
+    private static $list= null;	 // список всех страниц
 
-    protected function getList($menu = "menu")
+    // метод создания экземпляра с указанным кодом
+    public function __construct($code)
     {
-        if($this->list === null){
-            // получаем список страниц из БД
-            $arr = DBase::select("SELECT * FROM page ORDER BY $menu");
-            $this->list = $arr;}
-        return $this->list;
+        $this->code = $code;
+    }
+
+    // получаем список страниц из БД
+    public function getList($menu = "menu")
+    {
+        if(self::$list === null)
+            self::$list = DBase::select("SELECT * FROM page ORDER BY $menu");
+        return self::$list;
     }
 	// метод формирования меню
 	protected function setMenu($menu = "menu")
@@ -55,30 +60,37 @@ class Page extends Model
 		$code = $this->code;
 		foreach ($pages as $item){
 		    if($item['code'] == $code){
-                $this->title = $item['title'];
-		        return;
+                // $this->title = $item['title'];
+		        return $item['title'];
             }
         }
-	}
-	protected function validAdress($code){
-        foreach (self::getList() as $page){
-            if($code == $page['code'] || $code == 'index'){
-                return true;
-            }
-        }
-        header("HTTP/1.0 404 Not Found");
-        $this->title = "Нет такой страницы";
-        return false;
-    }
-    protected function prepareHead($code)
-	{
-        $this->code = $code;
-        $this->setTitle();
-        $nav = $this->setMenu();
-        $title = $this->title;
-        include VIEW_DIR_INCLUDE.'head.php';
 	}
 
+    /**
+     * метод формирования основного контента страницы
+     */
+    public function getContentPage(){
+        $result['nav'] = $this->setMenu();
+        $result['title'] = $this->setTitle();
+        return $result;
+    }
+    /**
+     * метод формирования 404 страницы
+     */
+    public function getContent404(){
+        header("HTTP/1.0 404 Not Found");
+        return $this->getContentPage();
+    }
+    /***
+     * метод подготовки контента
+     */
+
+    protected function getContent(){
+
+        $result['head']  = $this->prepareHead();
+        $result['content'] = $this->prepareBody();
+        return $result;
+    }
     /**
      * Функция подготовки основной части страницы
      * @param string $template - название шаблона
@@ -87,14 +99,15 @@ class Page extends Model
 	{
 		    include VIEW_DIR_PAGE.$template.'.php';
 	}
-	public function renderHtml($code)
+	public function renderHtml($code,$content)
 	{
+        include VIEW_DIR_INCLUDE.'head.php';
 	    // проверяем на корректность адрес
-	    $valid = $this->validAdress($code);
+	    //$valid = $this->validAdress($code);
 	    // подготавливаем голову
         $this->prepareHead($code);
         // если адрес корректный - подготовим контент
-        if($valid){
+        if($code == 404){
             $this->prepareBody($code);
         }
         // иначе - отобразим старницу ошибки
@@ -104,22 +117,5 @@ class Page extends Model
         // подключим низ страницы
         include VIEW_DIR_INCLUDE.'footer.php';
 	}
-	public function renderJson($code)
-	{
-	    // проверяем на корректность адрес
-	    $valid = $this->validAdress($code);
-	    // подготавливаем голову
-        //$this->prepareHead($code);
-        // если адрес корректный - подготовим контент
-        if($valid){
-            //$this->prepareBody($code);
-        }
-        // иначе - отобразим старницу ошибки
-        else {
-            //include VIEW_DIR_ERORS.'404.php';
-            echo json_encode("error: 404");
-        }
-        // подключим низ страницы
-        //include VIEW_DIR_INCLUDE.'footer.php';
-	}
+
 }
