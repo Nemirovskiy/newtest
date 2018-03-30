@@ -58,29 +58,19 @@ class Controller
     /**
      * метод формирования страницы
      * точка входа
-     *
      */
-    public function render()
-    {
-
-    }
+    public function render(){}
     /**
      * метод формирования заголовка и верхней части страницы
      */
-    protected function prepareHead(){
-
-    }
+    protected function prepareHead(){}
     /**
      * метод формирования основного контента страницы
      */
-    protected function prepareBody(){
-
-    }
+    protected function prepareBody(){}
     /**
      * метод формирования подвала страницы
      */
-    protected function prepareFooter(){
-
-    }
+    protected function prepareFooter(){}
 
 }
