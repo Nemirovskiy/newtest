@@ -1,7 +1,11 @@
 <pre><?//print_r($_SESSION)?></pre>
 <h1>Вопросы по теме <?=$theme?></h1>
-<div class="message">
-    <?=$message?>
+<div id="message" class="testMessage">
+    <?if(!empty($message['test'])):?>
+        <div class="alert alert-primary" role="alert" >
+            <?=$message['test']?>
+        </div>
+    <?endif;?>
 </div>
 <form action="" id="main" method="post">
     <h2>Вопрос № <?=$number?></h2>

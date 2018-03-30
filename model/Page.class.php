@@ -12,8 +12,6 @@
 */
 class Page extends Model
 {
-    protected $errors = '';
-    protected $message = '';
 	protected $title='Тестирование - Главная'; // заголовок
 	private $nav=[];	 // навигация
 	protected $code='';	 // символьное имя - код страницы

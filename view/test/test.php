@@ -1,8 +1,8 @@
 <h1>Вопросы по теме <?=$theme?></h1>
 <div id="message" class="testMessage">
-    <?if(!empty($message)):?>
+    <?if(!empty($message['test'])):?>
         <div class="alert alert-primary" role="alert" >
-            <?=$message?>
+            <?=$message['test']?>
         </div>
     <?endif;?>
 </div>
