@@ -10,22 +10,31 @@ class Test extends Page
     public static  $answers = []  ; 	// ответы
     public static  $wrong = false ; 	// ошибочный ответ
 
-    public function checkAnswer(){
+    public static function checkAnswer($theme){
         /**
-         * $_SESSION['used'][$theme][]  - массив отвеченных вопросов в теме
+         * $_SESSION['log'][$theme][]  - массив отвеченных вопросов в теме
          * $_SESSION['right'][$theme][] - массив правильных ответов в теме
          */
-        //echo "\nF:".__FUNCTION__;
-
-        $theme = $this->code;//echo "\nt:".$theme;
-        $answer = $_POST[$theme];
-        $right = $_SESSION["curent"]["right"];
-        foreach ($answer as $item){
-            $_SESSION["curent"]["answers"][$item - 1]['check'] = true;
+        //$answer = $_POST[$theme];
+        $right = $_SESSION["current"]["right"];
+        // помечаем отвеченный вариант ответа
+        foreach ($_POST[$theme] as $item){
+            // проверка входящего на число
+            $number = (int)$item;
+            if($number > 0){
+                $_SESSION["current"]["answers"][$item - 1]['check'] = true;
+                $answer[] = $number;
+            }
+            else{
+                Message::setError(MessageError::errorPostData);
+                return true;
+            }
         }
-        $_SESSION['used'][$theme][] = $_SESSION['curent']['number'];
+        // записываем в сессию номер отвеченного вопроса 
+        $_SESSION['log'][$theme][] = $_SESSION['current']['number'];
+        // собственно проверка правильности ответа
         if(implode(",",$answer) === implode(",",$right)){
-            $_SESSION['right'][$theme][] = $_SESSION['curent']['number'];
+            $_SESSION['right'][$theme][] = $_SESSION['current']['number'];
             return true;
         }
         else
@@ -39,75 +48,43 @@ class Test extends Page
      */
     private function generateNumberQuest($infinity = false){
         $theme = $this->code;
-        if($infinity || empty($_SESSION['used'][$theme]))
+        if($infinity || empty($_SESSION['log'][$theme]))
             $number = rand(1,self::getThemeList()[$theme]['count']);
-        elseif(count($_SESSION['used'][$theme]) < self::getThemeList()[$theme]['count']){
+        elseif(count($_SESSION['log'][$theme]) < self::getThemeList()[$theme]['count']){
             do{
                 $number = rand(1,self::getThemeList()[$theme]['count']);
-            }while(in_array($number,$_SESSION['used'][$theme]));
+            }while(in_array($number,$_SESSION['log'][$theme]));
         }
         else
             $number = false;
         return $number;
     }
 
-    private function buildReset(){
-
-        return [];
+    public static function cleanStat($code){
+        $_SESSION['log'][$code] = [];
+        Message::setTest(MessageTest::clean);
     }
     public function getContentNotest(){
         return [];
     }
-    public function getContentCheck(){
-        if($this->checkAnswer()){
-            // ответ верный
-            // показать, что ответ верный
-//                    $result = $this->getContentTest();
-//                    $result['message'] = 'Верно!';
-            return 'test';
-        }
-        else{
-            // ответ не верный
-            // показать ответ
-            //self::$wrong = true;
-            //$result = $this->getContentWrong();
-            return 'wrong';
-        }
-        echo __METHOD__."<br>";
-        return [];
-    }
-
+    
     public function getContentTest(){
-        // получим данные о страницы от родителя
-        $head = parent::getContentPage();
-        $_SESSION['curent']['code'] = $code = $this->code;
+        $_SESSION['current']['code'] = $code = $this->code;
         $test = $this->getTest($code,$this->generateNumberQuest());
-        $_SESSION['curent'] = $test;
+        $_SESSION['current'] = $test;
         $test['code'] = $code;
         $test['right'] = '';
-        $test['message'] = $this->message;
-        $test['errors'] = $this->errors;
-        return array_merge($test,$head);
+        return $test;
     }
     public function getContentWrong(){
-        $result = $_SESSION['curent'];
-        $result['wrong'] = 'true';
-        $result['message'] = $this->message;
-        $result['errors'] = $this->errors;
-        $result['user'] = $this->errors;
-        return $result;
+        return $_SESSION['current'];
     }
 
-    private function buildResult(){
+    public function getContentResult(){
         $code = $this->code;
-        //$result = $_SESSION;
-        //$_SESSION["curent"]["code"] = $code = $testTheme;
-        $result['used'] = $u = count($_SESSION['used'][$code]);
-        $result['right'] = $r = count($_SESSION['right'][$code]);
-        $result['ratio'] = ($r>0) ? round($r / $u * 100) : 0 ;
-        //$result['answers'] = $_SESSION["curent"]["answers"];
-        $result['message'] = $this->message;
-        $result['errors'] = $this->errors;
+        $result['count'] = $all = count($_SESSION['log'][$code]);
+        $result['right'] = $right = count($_SESSION['right'][$code]);
+        $result['ratio'] = ($right > 0) ? round($all / $right * 100) : 0 ;
         return $result;
     }
 
@@ -126,7 +103,7 @@ class Test extends Page
         }else{
             $execute = 'build'.ucfirst($template);
             $content = $this->$execute();
-            $content['used'] = $_SESSION['used'];
+            $content['log'] = $_SESSION['log'];
         }
         $content['message'] = $this->message;
         $content['errors'] = $this->errors;
@@ -200,16 +177,16 @@ class Test extends Page
      * структура хранения вопросов в сессии
      *
      * запись при ответе:
-     * $_SESSION['used'][$theme][]  - массив отвеченных вопросов в теме
+     * $_SESSION['log'][$theme][]  - массив отвеченных вопросов в теме
      * $_SESSION['right'][$theme][] - массив правильных ответов в теме
-     * $_SESSION['curent'][
+     * $_SESSION['current'][
      *       'theme'=> текущая тема
      *       'quest'=> [массив вопроса]
      * добавить при ответе:
      *       'used'=>  [массив выбранных вариантов]
      * ]
      *
-     * $_COOKIE['used']
+     * $_COOKIE['log']
      */
 
 

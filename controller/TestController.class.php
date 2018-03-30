@@ -25,46 +25,48 @@ class TestController extends PageController
         $theme = self::$code;
         $class = self::$class;
         $count = $class::getThemeList()[$theme]['count'];
-        $answer = !empty($_POST[$theme]);
-        $reset = !empty($_POST['reset']);
-
         if($count < 1){
             // вопросов в теме ещё нет
             return 'notest';
         }
-        elseif($answer){
-            return 'check';
+        elseif(isset($_POST[$theme])){
+            // есть ответ
+            if(Test::checkAnswer(self::$code)){
+                // ответ верный
+                Message::setTest(MessageTest::right);
+            }else{
+                // ответ ошибочный
+                Message::setTest(MessageTest::wrong);
+                return 'wrong';
+            }
         }
-        elseif ($reset){
-            return 'reset';
+        elseif (isset($_POST['reset'])){
+            Test::cleanStat(self::$code);
         }
-        if(count($_SESSION['used'][$theme]) == $count){
-            // отвечены все вопросы / ответ верный и вопросов больше нет
-            // показать статистику
+        if(count($_SESSION['log'][$theme]) == $count){
+            // отвечены все вопросы
+            // показать результат
             return 'result';
         }
         // показать новый вопрос
         return 'test';
     }
-    public function getTemplate()
+    public function render()
     {
-        echo " self::code - ".self::$code."<br>";
-        $template = VIEW_DIR_TEST;
-//        switch (self::$code){
-//            case 'notest':
-//                $template .= 'test.php';
-//                break;
-//            case 'notest':
-//                $template .= 'test.php';
-//                break;
-//            default: $template .= 'test.php';
-//        }
-        if(self::$code !== 'notest' && self::$code !== 'wrong' && self::$code !== 'result')
-            $template = VIEW_DIR_TEST.'test.php';
-        else
-            $template = VIEW_DIR_TEST.self::$code.'.php';
-        return [$template,VIEW_DIR_TEST.'footer.php'];
+        $class = self::$class;
+        // создаем экзепляр класса с указанием кода
+        $page = new $class(self::$code);
+        // получаем действие
+        $action = $this->getAction();
+        $execute = 'getContent'.ucfirst($action);
+        // выполняем действие - получаем контент
+        $head = $page->getContentPage();
+        $content = $page->$execute();
+        $content = array_merge($content,$head);
+        $content['message'] = Message::get();
+        // выбираем шаблон
+        $template = [VIEW_DIR_TEST.$action.'.php',VIEW_DIR_TEST.'footer.php'];
+        $this->getView($template,$content);
     }
-
 
 }

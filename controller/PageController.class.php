@@ -20,15 +20,21 @@ class PageController extends Controller
         // создаем экзепляр класса с указанием кода
         $page = new $class(self::$code);
         // получаем действие
-        $action = 'getContent'.ucfirst($this->getAction());
+        $action = $this->getAction();
+        $action = 'getContent'.ucfirst($action);
         // выполняем действие - получаем контент
         $head = $page->getContentPage();
         $content = $page->$action();
 
         $content = array_merge($content,$head);
+        /**
+         * раскомментировать для добавления сообщений
+         * через класс сообщений
+         * $content['message'] = Message::get();
+         */
         //print_r($content);
         // выбираем шаблон
-        $template = $this->getTemplate();
+        $template = $this->getTemplate($action);
         $this->getView($template,$content);
         //$page->renderHead(self::$code);
         //$page->renderBody();
@@ -55,7 +61,7 @@ class PageController extends Controller
     protected function prepareHead(){
 
     }
-    protected function getAction($code='')
+    protected function getAction()
     {
         if(self::$code == 404){
             return '404';
