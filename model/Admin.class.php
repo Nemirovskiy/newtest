@@ -246,23 +246,27 @@ class Admin extends Page
      * метод проверки наличия темы для добавления вопросов
      * @return bool
      */
-    private function checkAddTheme(){
+    public static function checkAddTheme(){
         // если выбрано добавление темы
         if(strip_tags($_POST['addCode']) === 'new'){
             if(empty($_POST['newCode']) && empty($_POST['newName'])){
-                $this->errors .= "Не указана новая тема для добавления тестов.<br>";
+                Message::setError(MessageError::errorAddThemeNotCode);
+                //$this->errors .= "Не указана новая тема для добавления тестов.<br>";
                 return false;
             }
             elseif(array_key_exists(strip_tags($_POST['newCode']), Test::getThemeList() )){
-                $this->errors .= "Нельзя указать для новой темы код существующей.<br>";
+                Message::setError(MessageError::errorAddThemeCodeExist);
+                //$this->errors .= "Нельзя указать для новой темы код существующей.<br>";
+                return false;
+            }
+            elseif( isset(Page::getList()['']) ){
+                Message::setError(MessageError::errorAddThemeCodeExist);
+                //$this->errors .= "Нельзя указать для новой темы код существующей.<br>";
                 return false;
             }else{
                 $theme['code'] = $_SESSION['theme']['code'] = strip_tags($_POST['newCode']);
                 $theme['name'] = $_SESSION['theme']['name'] = strip_tags($_POST['newName']);
             }
-        }elseif (empty($_POST['addCode'])){
-            $this->errors .= "Не указана тема для добавления тестов.<br>";
-            return false;
         }else{
             $theme['code'] = $_SESSION['theme']['code'] = strip_tags($_POST['addCode']);
             $theme['name'] = $_SESSION['theme']['name'] = Test::getThemeList()[$theme['code']]['text'];
@@ -286,12 +290,12 @@ class Admin extends Page
         $message = trim($this->message,"<br>");
         include VIEW_DIR_ADMIN.$template.'.php';
     }*/
-    private function buildAddTest(){
+    public function getContentAddtest(){
         $theme = Test::getThemeList();
         return ['theme'=>$theme];
     }
 
-    private function buildPreviewAddTest(){
+    public function getContentPreviewAddTest(){
         $preTest = $this->prepareQuests();
         $tests = $this->convertQuests($preTest);
         if($tests){
@@ -301,53 +305,16 @@ class Admin extends Page
         //$this->errors .= "Нет тестов для добавления<br>";
         return false;
     }
-    private function buildAddTestBD(){
+    public function getContentAddTestBD(){
         echo "<pre>";
         print_r($_SESSION);
         var_dump($this->insertAddTest());
         echo "</pre>";
     }
-    private function buildAdmin(){
+    public function getContentAdmin(){
         return [];
     }
-    private function separation(){
-        /**
-         *
-         */
-        // код подготовки для проверки
-
-        // проверяем есть ли пост?
-        if(!empty($_POST)){
-            // если есть указанная тема
-            // проверим есть ли текст/файл
-            if(!empty($_POST['addCode'])){
-                if($this->checkAddTheme() && $this->prepareQuests()){
-                    // покажем загруженные тесты и спросим добавить?
-                    // отобразить список тестов
-                    return 'previewAddTest';
-                }else{
-                    //$this->errors .= "Не указан текст для добавления тестов.<br>";
-                    return false;
-                }
-            }
-            // если нет файла - покажем ошибку
-            if (isset($_SESSION['addTests']) && isset($_POST['submit'])){
-                // нажата кнопка добавить
-                // добавим в БД
-                if(empty($_SESSION['addTests'])){
-                    $this->errors .= "Нет текста для добавления тестов.<br>";
-                    return false;
-                }
-                return 'addTestBD';
-            }
-        }
-        elseif(0){
-            //
-        }
-        // если условия не подошли - укажем код текущей страницы
-        return $this->code;
-    }
-    /**
+      /**
      * метод подготовки отображения основной части станицы
      * @param string $template
      */
