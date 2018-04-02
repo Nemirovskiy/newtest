@@ -60,18 +60,36 @@ class Test extends Page
         return $number;
     }
 
+    /**
+     * метод сброса статистики
+     * записывает в переменную test Класса сообщений
+     * текст из константы класса сообщений теста
+     * @param $code string - код темы
+     */
     public static function cleanStat($code){
         $_SESSION['log'][$code] = [];
+        $_SESSION['right'][$code] = [];
         Message::setTest(MessageTest::clean);
     }
+
+    /**
+     * метод формирования контента для
+     * темы без тестов
+     * @return array
+     */
     public function getContentNotest(){
+        echo "code = ".$_SESSION['current']['code'];
         return [];
     }
-    
+
+    /**
+     * метод формирования контента
+     * теста указанной темы
+     * @return array
+     */
     public function getContentTest(){
         $_SESSION['current']['code'] = $code = $this->code;
         $test = $this->getTest($code,$this->generateNumberQuest());
-        $_SESSION['current'] = $test;
         $test['code'] = $code;
         $test['stat']['choice'] = $count = count($_SESSION['log'][$code]);
         $test['stat']['all'] = $all = Test::$list[$code]['count'];
