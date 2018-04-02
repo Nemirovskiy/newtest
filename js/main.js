@@ -5,7 +5,7 @@ function generateNew(e) {
     var form = $('#main');
     form.html('');
     $('<h2/>').text('Вопрос № ' + e.number).appendTo(form);
-    $('<h3/>').text(e.quest).appendTo(form);
+    $('<h3/>').html(e.quest).appendTo(form);
     var list = $('<div/>');
     list.addClass('col-sm');
     e.answers.forEach(function (answ) {
@@ -25,7 +25,7 @@ function generateWrong(e) {
     var form = $('#main');
     form.html('');
     $('<h2/>').text('Вопрос № ' + e.number).appendTo(form);
-    $('<h3/>').text(e.quest).appendTo(form);
+    $('<h3/>').html(e.quest).appendTo(form);
     var list = $('<ul/>').addClass('answerList');
     e.answers.forEach(function (answ) {
         var li =$('<li/>');
@@ -43,7 +43,7 @@ function generateResult(e){
     var main = $('#main');
     main.html('');
     $('<h3/>').text('Отвечены все вопросы в теме').appendTo(main);
-    $('<p/>').text('Отвечено '+ e.used[e.code].length + ' вопросов').appendTo(main);
+    $('<p/>').text('Отвечено '+ e.stat.choice + ' вопросов').appendTo(main);
     $('<h4/>').text(e.ratio + '%').appendTo(main);
     $('#submit').prop('disabled', false);
 }
@@ -116,7 +116,7 @@ function showStat(e) {
     $('.statChoice').text(e.stat.choice);
     $('.statRatioC').text(e.stat.ratioC);
     $('.statRatioR').text(e.stat.ratioR);
-    //$('.progress-bar.stat')
+    $('.progress-bar.stat').css('width',e.stat.ratioC+'%').prop('aria-valuenow',e.stat.ratioC);
 }
 
 // запуск программы
@@ -141,7 +141,8 @@ $(function () {
             method: 'POST',
             dataType: 'json',
             data: data,
-            success: successSubmit
+            success: successSubmit,
+            error: errorSubmit
         })
     });
 
