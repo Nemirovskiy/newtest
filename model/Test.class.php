@@ -91,16 +91,24 @@ class Test extends Page
         $_SESSION['current']['code'] = $code = $this->code;
         $test = $this->getTest($code,$this->generateNumberQuest());
         $test['code'] = $code;
-        $test['stat']['choice'] = $count = count($_SESSION['log'][$code]);
-        $test['stat']['all'] = $all = Test::$list[$code]['count'];
-        $test['stat']['right'] = $right = count($_SESSION['right'][$code]);
-        $test['stat']['ratioR'] = ($count > 0) ? round($right / $count * 100) : 0 ;
-        $test['stat']['ratioC'] = ($all > 0) ? round($count / $all * 100) : 0 ;
+        $test['stat'] = $this->getStat();
         $_SESSION['current'] = $test;
         return $test;
     }
+    private function getStat(){
+        $code = $this->code;
+        $result['choice'] = $count = count($_SESSION['log'][$code]);
+        $result['all'] = $all = Test::$list[$code]['count'];
+        $result['right'] = $right = count($_SESSION['right'][$code]);
+        $result['ratioR'] = ($count > 0) ? round($right / $count * 100) : 0 ;
+        $result['ratioC'] = ($all > 0) ? round($count / $all * 100) : 0 ;
+        return $result;
+    }
     public function getContentWrong(){
-        return $_SESSION['current'];
+        $result = $_SESSION['current'];
+        $result['wrong'] = true;
+        $result['stat'] = $this->getStat();
+        return $result;
     }
 
     public function getContentResult(){
@@ -108,7 +116,7 @@ class Test extends Page
         $result['count'] = $all = count($_SESSION['log'][$code]);
         $result['right'] = $right = count($_SESSION['right'][$code]);
         $result['ratio'] = ($right > 0) ? round($right / $all * 100) : 0 ;
-
+        $result['stat'] = $this->getStat();
         return $result;
     }
 

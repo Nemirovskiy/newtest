@@ -32,7 +32,7 @@ class Message
 
         return [
             'errors' => self::$textError,
-            'message' => self::$textMessage,
+            'info' => self::$textMessage,
             'test' => self::$textTest
         ];
     }

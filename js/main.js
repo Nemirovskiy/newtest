@@ -1,4 +1,5 @@
-
+// переменные необходимые для работы
+var timeoutAlert; // номер таймаута
 // отображение нового вопроса
 function generateNew(e) {
     var form = $('#main');
@@ -49,7 +50,7 @@ function generateResult(e){
 
 //
 function errorSubmit(d,e) {
-    if(e !== 'parserror'){
+    if(e === 'error'){
         $('#main').removeClass('wait');
         $('#submit').val('Ок').prop('disabled',false);
         $('<div/>',{
@@ -66,11 +67,12 @@ function errorSubmit(d,e) {
 // функция обработки ответа сервера на нажатие кнопки ответить
 function successSubmit(s) {
     showMessage(s);
+    showStat(s);
     $('#main').removeClass('wait');
     $('#submit').val('Ок');
-    if(s.wrong == 'true'){
+    if(s.wrong == true){
         generateWrong(s);
-    }else if(s.number > 0){
+    }else if(parseInt(s.number) > 0){
         generateNew(s);
     }else{
         generateResult(s);
@@ -79,20 +81,42 @@ function successSubmit(s) {
 
 // отображение сообщений и ошибок если они есть
 function showMessage(e) {
-    if(e.errors.length > 0){
-        $('<div/>',{
-            'class': 'alert alert-danger',
-            'role': 'alert'
-        }).text(e.errors).appendTo('#message');
-    }else if(e.message.length > 0){
+
+    if(e.message.test.length > 0){
+        clearTimeout(timeoutAlert);
+        $('#messageTest').html('');
         $('<div/>',{
             'class': 'alert alert-info',
             'role': 'alert'
-        }).text(e.message).appendTo('#message');
+        }).text(e.message.test).appendTo('#messageTest');
+    }else if(e.message.info.length > 0){
+        clearTimeout(timeoutAlert);
+        $('#message').html('');
+        $('<div/>',{
+            'class': 'alert alert-info',
+            'role': 'alert'
+        }).text(e.message.info).appendTo('#message');
+    }else if(e.message.errors.length > 0){
+        clearTimeout(timeoutAlert);
+        $('#message').html('');
+        $('<div/>',{
+            'class': 'alert alert-danger',
+            'role': 'alert'
+        }).text(e.message.errors).appendTo('#message');
     };
-    setTimeout(function () {
-        $(".testMessage .alert").alert('close');
+    timeoutAlert = setTimeout(function () {
+        $(".alert").alert('close');
     }, 5000);
+}
+
+// изменение статистики
+function showStat(e) {
+    $('.statAll').text(e.stat.all);
+    $('.statRight').text(e.stat.right);
+    $('.statChoice').text(e.stat.choice);
+    $('.statRatioC').text(e.stat.ratioC);
+    $('.statRatioR').text(e.stat.ratioR);
+    //$('.progress-bar.stat')
 }
 
 // запуск программы
@@ -142,13 +166,11 @@ $(function () {
         $('input:checked').not(':disabled').each(function () {
             val.push($(this).val());
             code = $(this).prop('name').slice(0,-2);
-            //alert(code);
         });
         var data = {
             "ajax": "ajax"
         };
         data[code] = val,
-            //console.log(val);
             $.ajax({
                 method: 'POST',
                 dataType: 'json',
