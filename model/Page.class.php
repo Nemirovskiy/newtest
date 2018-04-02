@@ -24,7 +24,7 @@ class Page extends Model
     }
 
     // получаем список страниц из БД
-    public function getList($menu = "menu")
+    public static function getList($menu = "menu")
     {
         if(self::$list === null)
             self::$list = DBase::select("SELECT * FROM page ORDER BY $menu");
@@ -34,7 +34,7 @@ class Page extends Model
 	protected function setMenu($menu = "menu")
 	{
 	    // получаем список страниц
-		$pages = $this->getList();
+		$pages = self::getList();
 		$code = $this->code;
 		$nav = [];
 		foreach ($pages as $key => $value) {
