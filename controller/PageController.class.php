@@ -25,35 +25,11 @@ class PageController extends Controller
         // выполняем действие - получаем контент
         $head = $page->getContentPage();
         $content = $page->$action();
-
         $content = array_merge($content,$head);
-        /**
-         * раскомментировать для добавления сообщений
-         * через класс сообщений
-         * $content['message'] = Message::get();
-         */
-        //print_r($content);
+        $content['message'] = Message::get();
         // выбираем шаблон
-        $template = $this->getTemplate($action);
+        $template = (self::$code == 404) ? VIEW_DIR_ERORS.'404.php' : VIEW_DIR_PAGE.self::$code.'.php';
         $this->getView($template,$content);
-        //$page->renderHead(self::$code);
-        //$page->renderBody();
-        //include VIEW_DIR_ERORS.'404.php';
-        //$page->renderHtml(self::$code);
-        /*
-        $this->prepareHead();
-        $this->prepareBody();
-        $this->prepareFooter();
-        */
-    }
-
-    /***
-     * метод выбора шаблона
-     */
-    public function getTemplate(){
-        // если нет страницы (404) - шаблон ошибки,
-        // иначе - шаблон страницы по коду
-        return (self::$code == 404) ? VIEW_DIR_ERORS.'404.php' : VIEW_DIR_PAGE.self::$code.'.php';
     }
     /**
      * метод формирования заголовка и верхней части страницы
