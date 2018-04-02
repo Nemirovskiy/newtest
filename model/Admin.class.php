@@ -184,7 +184,8 @@ class Admin extends Page
         try{
             if(isset(Test::getThemeList()[$code])){
                 if(!DBase::delAllFromTheme($code)){
-                    $this->errors .= "Ошибка очистки темы $code";
+                   // $this->errors .= "Ошибка очистки темы $code";
+                    Message::setError(MessageError::errorAddCleanTheme .$code);
                     return false;
                 }
             }
@@ -195,9 +196,11 @@ class Admin extends Page
                     'count'=> 0
                 ];
                 if(DBase::insertTheme($theme)){
-                    $this->message .= "Добавлена тема ".$theme['code']." - ". $theme['name']."<br>";
+                    //$this->message .= "Добавлена тема ".$theme['code']." - ". $theme['name']."<br>";
+                    Message::setMessage(MessageInfo::infoCreateThemeTheme ." - ". $theme['name']);
                 }else{
-                    $this->errors .= "Ошибка добавления темы ".$theme['code']." - ". $theme['name']."<br>";
+                    //$this->errors .= "Ошибка добавления темы ".$theme['code']." - ". $theme['name']."<br>";
+                    Message::setError(MessageError::errorAddNewTheme .$theme['code']." - ". $theme['name']);
                     return false;
                 }
             }
@@ -211,7 +214,8 @@ class Admin extends Page
                 if($addQuest)
                     $count++;
                 else{
-                    $this->errors .= "Ошибка записи вопроса $num<br>";
+                    //$this->errors .= "Ошибка записи вопроса $num<br>";
+                    Message::setError(MessageError::errorAddQuest .$num);
                     return false;
                 }
                 // перебор вариантов ответов
@@ -223,23 +227,27 @@ class Admin extends Page
                         $answer['text']
                     ];
                     if(!DBase::insertAddAnswer($value)){
-                        $this->errors .= "Ошибка записи ответа $key на вопрос $num<br>";
+                        //$this->errors .= "Ошибка записи ответа $key на вопрос $num<br>";
+                        Message::setError(MessageError::errorAddAnswer1. $key . MessageError::errorAddAnswer2 .$num);
                         return false;
                     }
                 }
             }
             if(!DBase::updateThemeCount($code,$count)){
-                $this->errors .= "Ошибка обновления темы<br>";
+                //$this->errors .= "Ошибка обновления темы<br>";
+                Message::setError(MessageError::errorAddUpdateTheme);
                 return false;
             }
         }catch (Exception $e){
             echo "Ошибка записи в базу: ".$e;
         }
         if(empty($this->errors)){
-            $this->message .= "Добавлено вопросов $count<br>";
+            //$this->message .= "Добавлено вопросов $count<br>";
+            Message::setMessage(MessageInfo::infoAddQuests . $count);
             unset($_SESSION['addTests']);
+            return ['theme' => Test::getThemeList()];
         }
-        return [];
+        return false;
     }
 
     /**
@@ -247,24 +255,29 @@ class Admin extends Page
      * @return bool
      */
     public static function checkAddTheme(){
+        $newCode = strip_tags($_POST['newCode']);
         // если выбрано добавление темы
         if(strip_tags($_POST['addCode']) === 'new'){
-            if(empty($_POST['newCode']) && empty($_POST['newName'])){
+            if(empty($newCode) && empty($_POST['newName'])){
                 Message::setError(MessageError::errorAddThemeNotCode);
                 //$this->errors .= "Не указана новая тема для добавления тестов.<br>";
                 return false;
             }
-            elseif(array_key_exists(strip_tags($_POST['newCode']), Test::getThemeList() )){
+            elseif(array_key_exists($newCode, Test::getThemeList() )){
                 Message::setError(MessageError::errorAddThemeCodeExist);
                 //$this->errors .= "Нельзя указать для новой темы код существующей.<br>";
                 return false;
             }
-            elseif( isset(Page::getList()['']) ){
-                Message::setError(MessageError::errorAddThemeCodeExist);
-                //$this->errors .= "Нельзя указать для новой темы код существующей.<br>";
-                return false;
+            elseif( 1 ){
+                foreach (Page::getList() as $page){
+                    if($page['code'] == $newCode){
+                        Message::setError(MessageError::errorAddThemeCodeExist);
+                        //$this->errors .= "Нельзя указать для новой темы код существующей.<br>";
+                        return false;
+                    }
+                }
             }else{
-                $theme['code'] = $_SESSION['theme']['code'] = strip_tags($_POST['newCode']);
+                $theme['code'] = $_SESSION['theme']['code'] = $newCode;
                 $theme['name'] = $_SESSION['theme']['name'] = strip_tags($_POST['newName']);
             }
         }else{
@@ -300,17 +313,24 @@ class Admin extends Page
         $tests = $this->convertQuests($preTest);
         if($tests){
             $_SESSION['addTests'] = $tests;
-            return $_SESSION;
+            $result = $_SESSION;
+            $result['count'] = count($tests);
+            return $result;
         }
         //$this->errors .= "Нет тестов для добавления<br>";
+        Message::setError(MessageError::errorAddNotQuests);
         return false;
     }
-    public function getContentAddTestBD(){
-        echo "<pre>";
-        print_r($_SESSION);
-        var_dump($this->insertAddTest());
-        echo "</pre>";
-    }
+//    public function getContentAddTestBD(){
+//        echo "<pre>";
+//        print_r($_SESSION);
+//        var_dump();
+//        echo "</pre>";
+//        if($this->insertAddTest()){
+//
+//        }
+//        return [];
+//    }
     public function getContentAdmin(){
         return [];
     }
