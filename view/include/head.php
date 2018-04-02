@@ -40,3 +40,15 @@
 		<?endforeach;?>
 		</nav>
 	</header>
+    <div id="message" class="testMessage">
+        <?if(!empty($message['info'])):?>
+            <div class="alert alert-primary" role="alert" >
+                <?=$message['info']?>
+            </div>
+        <?endif;?>
+        <?if(!empty($message['errors'])):?>
+            <div class="alert alert-warning" role="alert" >
+                <?=$message['errors']?>
+            </div>
+        <?endif;?>
+    </div>

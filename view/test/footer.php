@@ -1,6 +1,7 @@
+
 <div class='cntr'><br>
     <form method="post">
-        <button class="btn m-2 col-sm-2 col-3 btn-outline-warning btn-sm"  name="reset" value="<?=$code?>">Сброс</button>
+        <button id="reset" class="btn m-2 col-sm-2 col-3 btn-outline-warning btn-sm"  name="reset" value="<?=$code?>">Сброс</button>
     </form>
     <br>
 <!--    <form action="post"  method="post">-->

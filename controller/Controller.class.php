@@ -18,7 +18,7 @@ class Controller
         $url = explode("/",$_GET['t']);
         $name = !empty($url[0]) ? strip_tags($url[0]) : 'index';
         self::$code = $name;
-        if(self::validAdress()) {
+        if(self::validAddress()) {
             if (is_file(VIEW_DIR_PAGE . $name . '.php'))
                 self::$class = 'Page';
             // или административная
@@ -38,10 +38,9 @@ class Controller
     /**
      * метод проверки зарегистрированных страниц
      */
-    protected static function validAdress(){
+    protected static function validAddress(){
         foreach (Page::getList() as $page){
             $code = self::$code;
-            //echo $page['code']."<br>";
             if($code == $page['code'] || $code == 'index'){
                 return true;
             }
@@ -50,11 +49,9 @@ class Controller
     }
 
     /***
-     * метод определения ситуации
+     * метод определения действия
      */
-    protected function separate(){
-
-    }
+    protected function getAction(){}
     /**
      * метод формирования страницы
      * точка входа
@@ -63,14 +60,4 @@ class Controller
     /**
      * метод формирования заголовка и верхней части страницы
      */
-    protected function prepareHead(){}
-    /**
-     * метод формирования основного контента страницы
-     */
-    protected function prepareBody(){}
-    /**
-     * метод формирования подвала страницы
-     */
-    protected function prepareFooter(){}
-
 }

@@ -28,16 +28,20 @@
         <input id='submit' class="btn m-2 col-5 col-sm-5 btn-outline-primary" type='submit' value='Ok'>
     </div>
 </form>
-<div class="col-sm-7">
+<div class="col-sm-7" id="statistic">
     <p>
-        Отвечено: <?=$stat['choice']?> из <?=$stat['all']?> (<?=$stat['ratioC']?>%)
+        Отвечено: <span class="statChoice"><?=$stat['choice']?></span>
+        из <span class="statAll"><?=$stat['all']?></span>
+        (<span class="statRatioC"><?=$stat['ratioC']?></span>%)
     </p>
     <p>
-        Верно: <?=$stat['right']?> из <?=$stat['choice']?> (<?=$stat['ratioR']?>%)
+        Верно: <span class="statRight"><?=$stat['right']?></span>
+        из <span class="statChoice"><?=$stat['choice']?></span>
+        (<span class="statRatioR"><?=$stat['ratioR']?></span> %)
     </p>
 </div>
 <div class="progress">
-    <div class="progress-bar
+    <div class="progress-bar stat
     <?if($stat['ratioR'] > 75):?>
     bg-info
     <?else:?>

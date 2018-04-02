@@ -29,14 +29,12 @@ class PageController extends Controller
         $content['message'] = Message::get();
         // выбираем шаблон
         $template = (self::$code == 404) ? VIEW_DIR_ERORS.'404.php' : VIEW_DIR_PAGE.self::$code.'.php';
-        $this->getView($template,$content);
+//        if(empty($_POST['ajax']))
+            $this->getView($template,$content);
+//        else
+//            $this->getAjax($content);
     }
-    /**
-     * метод формирования заголовка и верхней части страницы
-     */
-    protected function prepareHead(){
 
-    }
     protected function getAction()
     {
         if(self::$code == 404){
@@ -45,22 +43,24 @@ class PageController extends Controller
             return self::$class;
         }
     }
-    /***
-     *
-     */
+
     protected function getView($template,$content = []){
         ob_start();
-        foreach ($content as $key=>$item){
-            $$key = $item;
-        }
-        include VIEW_DIR_INCLUDE.'head.php';
-        if(is_array($template)){
-            foreach ($template as $item){
-                include $item;
+        if(empty($_POST['ajax'])){
+            foreach ($content as $key=>$item){
+                $$key = $item;
             }
-        }else
-            include $template;
-        include VIEW_DIR_INCLUDE.'footer.php';
+            include VIEW_DIR_INCLUDE.'head.php';
+            if(is_array($template)){
+                foreach ($template as $item){
+                    include $item;
+                }
+            }else
+                include $template;
+            include VIEW_DIR_INCLUDE.'footer.php';
+        }
+        else
+            echo json_encode($content);
         ob_end_flush();
     }
 }
