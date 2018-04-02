@@ -174,7 +174,7 @@ class Admin extends Page
      * метод добавления загруженных тестов в базу
      *
      */
-    private function insertAddTest(){
+    public function getContentAddTestBD(){
         /**
          * @var int $lastQuest -
          *

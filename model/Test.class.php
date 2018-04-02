@@ -78,7 +78,6 @@ class Test extends Page
      * @return array
      */
     public function getContentNotest(){
-        echo "code = ".$_SESSION['current']['code'];
         return [];
     }
 

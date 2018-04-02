@@ -35,13 +35,12 @@ class Page extends Model
 	{
 	    // получаем список страниц
 		$pages = self::getList();
-		$code = $this->code;
 		$nav = [];
 		foreach ($pages as $key => $value) {
 		    if($value[$menu] > 0) {
 		        $nav[$key] = $value;
-		        if($value['code'] == $code){
-                     $nav[$key]['active'] = $flag= true;
+		        if($value['code'] == $this->code){
+                     $nav[$key]['active'] = true;
                 }
                 // если код текущей старницы index - ссылка будет без кода
                 if($nav[$key]['code'] == 'index') $nav[$key]['code']='';

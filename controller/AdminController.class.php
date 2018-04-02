@@ -26,7 +26,7 @@ class AdminController extends PageController
                 }else{
                     Message::setError(MessageError::errorAddNotText);
                     //$this->errors .= "Не указан текст для добавления тестов.<br>";
-                    return false;
+                    return 'addTest';
                 }
             }
             // если нет файла - покажем ошибку
@@ -36,7 +36,7 @@ class AdminController extends PageController
                 if(empty($_SESSION['addTests'])){
                     Message::setError(MessageError::errorAddNotText);
                     //$this->errors .= "Нет текста для добавления тестов.<br>";
-                    return false;
+                    return 'addTest';
                 }
                 return 'addTestBD';
             }
@@ -58,7 +58,13 @@ class AdminController extends PageController
         $execute = 'getContent'.ucfirst($action);
         // выполняем действие - получаем контент
         $head = $page->getContentPage();
+
         $content = $page->$execute();
+        if($content === false){
+            $action = self::$code;
+            $execute = 'getContent'.ucfirst($action);
+            $content = $page->$execute();
+        }
         $content = array_merge($content,$head);
         $content['message'] = Message::get();
         // выбираем шаблон
