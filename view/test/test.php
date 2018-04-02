@@ -30,4 +30,19 @@
 </form>
 <script>
 
-</script>
+</script><div class="col-sm-7">
+    <p>
+        Отвечено: <?=$stat['choice']?> из <?=$stat['all']?> (<?=$stat['ratioC']?>%)
+    </p>
+    <p>
+        Верно: <?=$stat['right']?> из <?=$stat['choice']?> (<?=$stat['ratioR']?>%)
+    </p>
+</div>
+<div class="progress">
+    <div class="progress-bar
+    <?if($stat['ratioR'] > 75):?>
+    bg-info
+    <?else:?>
+    bg-danger
+    <?endif;?>" role="progressbar" style="width: <?=$stat['ratioC']?>%" aria-valuenow="<?=$stat['ratioC']?>" aria-valuemin="0" aria-valuemax="100"></div>
+</div>

@@ -73,7 +73,12 @@ class Test extends Page
         $test = $this->getTest($code,$this->generateNumberQuest());
         $_SESSION['current'] = $test;
         $test['code'] = $code;
-        $test['right'] = '';
+        $test['stat']['choice'] = $count = count($_SESSION['log'][$code]);
+        $test['stat']['all'] = $all = Test::$list[$code]['count'];
+        $test['stat']['right'] = $right = count($_SESSION['right'][$code]);
+        $test['stat']['ratioR'] = ($count > 0) ? round($right / $count * 100) : 0 ;
+        $test['stat']['ratioC'] = ($all > 0) ? round($count / $all * 100) : 0 ;
+        $_SESSION['current'] = $test;
         return $test;
     }
     public function getContentWrong(){
@@ -84,7 +89,8 @@ class Test extends Page
         $code = $this->code;
         $result['count'] = $all = count($_SESSION['log'][$code]);
         $result['right'] = $right = count($_SESSION['right'][$code]);
-        $result['ratio'] = ($right > 0) ? round($all / $right * 100) : 0 ;
+        $result['ratio'] = ($right > 0) ? round($right / $all * 100) : 0 ;
+
         return $result;
     }
 
