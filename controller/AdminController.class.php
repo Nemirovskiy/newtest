@@ -62,6 +62,7 @@ class AdminController extends PageController
         $content = array_merge($content,$head);
         $content['message'] = Message::get();
         // выбираем шаблон
+        $action = ($action == "addTestBD")? 'addtest':$action;
         $template = VIEW_DIR_ADMIN.$action.'.php';
         $this->getView($template,$content);
     }
