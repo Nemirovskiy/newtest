@@ -1,6 +1,5 @@
 <div class='cntr'>
-    <br> Читай инструкцию! &#8593;
-	<br>
+
 	<span itemprop="description">
 		Неофициальный сайт студентов-фельдшеров 
 		<br>

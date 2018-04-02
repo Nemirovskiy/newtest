@@ -33,10 +33,5 @@
     </p>
 </div>
 <div class="progress">
-    <div class="progress-bar
-    <?if($stat['ratioR'] > 75):?>
-    bg-info
-    <?else:?>
-    bg-danger
-    <?endif;?>" role="progressbar" style="width: <?=$stat['ratioC']?>%" aria-valuenow="<?=$stat['ratioC']?>" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="progress-bar stat bg-info" role="progressbar" style="width: <?=$stat['ratioC']?>%" aria-valuenow="<?=$stat['ratioC']?>" aria-valuemin="0" aria-valuemax="100"></div>
 </div>

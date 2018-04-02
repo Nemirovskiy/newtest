@@ -1,20 +1,33 @@
-<div class="cntr">
-    <div id="messageTest" class="testMessage col-sm-5">
-        <?if(!empty($message['test'])):?>
-            <div class="alert alert-primary" role="alert" >
-                <?=$message['test']?>
-            </div>
-        <?endif;?>
-    </div>
-    <h3>Вы ответили на все вопросы в этой теме.</h3>
-    <h3>Отвечено <?=$count?> вопросов</h3>
-    <?if($ratio > 75):?>
-    <h2>Вы сдали!</h2>
-    <?else:?>
-    <h2>Вы не сдали!</h2>
-    <?endif?>
-    <h3><?=$ratio?>%</h3>
+<h1>Вопросы по теме <?=$theme?></h1>
+<div id="messageTest" class="testMessage col-sm-5">
+    <?if(!empty($message['test'])):?>
+        <div class="alert alert-primary" role="alert" >
+            <?=$message['test']?>
+        </div>
+    <?endif;?>
 </div>
-<!--Вопросы: 3 из 3 (100%)-->
-<br>
-Верно: <?=$right?> из <?=$count?>:  (<?=$ratio?>%)
+
+
+<form method="post">
+    <div id="main" class="col-sm-12" >
+        <h3>Вы ответили на все вопросы в этой теме.</h3>
+    </div>
+    <div class="col-sm-8 row mx-auto justify-content-center" >
+        <input id='submit' class="btn m-2 col-5 col-sm-5 btn-outline-primary" type='submit' value='Ok'>
+    </div>
+</form>
+<div class="col-sm-7" id="statistic">
+    <p>
+        Отвечено: <span class="statChoice"><?=$stat['choice']?></span>
+        из <span class="statAll"><?=$stat['all']?></span>
+        (<span class="statRatioC"><?=$stat['ratioC']?></span>%)
+    </p>
+    <p>
+        Верно: <span class="statRight"><?=$stat['right']?></span>
+        из <span class="statChoice"><?=$stat['choice']?></span>
+        (<span class="statRatioR"><?=$stat['ratioR']?></span> %)
+    </p>
+</div>
+<div class="progress">
+    <div class="progress-bar stat bg-info" role="progressbar" style="width: <?=$stat['ratioC']?>%" aria-valuenow="<?=$stat['ratioC']?>" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
