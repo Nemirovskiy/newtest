@@ -8,5 +8,6 @@
 
 class MessageInfo extends Message
 {
-
+    const infoCreateTheme = "Создана тема ";
+    const infoAddQuests = "Добавлено вопросов ";
 }
