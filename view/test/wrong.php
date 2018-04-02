@@ -1,6 +1,6 @@
 <pre><?//print_r($_SESSION)?></pre>
 <h1>Вопросы по теме <?=$theme?></h1>
-<div id="message" class="testMessage">
+<div id="message" class="testMessage col-sm-5">
     <?if(!empty($message['test'])):?>
         <div class="alert alert-primary" role="alert" >
             <?=$message['test']?>
@@ -15,7 +15,6 @@
             <li class="<?
             if($answer['check'] === true) echo " answerCheck";
             if($answer['right']) echo " text-success answerRight";
-            //else echo " otv";
             ?>">
                 <p><?=$answer['text']?></p>
             </li>

@@ -1,5 +1,5 @@
 <h1>Вопросы по теме <?=$theme?></h1>
-<div id="message" class="testMessage">
+<div id="messageTest" class="testMessage col-sm-5">
     <?if(!empty($message['test'])):?>
         <div class="alert alert-primary" role="alert" >
             <?=$message['test']?>
@@ -28,9 +28,7 @@
         <input id='submit' class="btn m-2 col-5 col-sm-5 btn-outline-primary" type='submit' value='Ok'>
     </div>
 </form>
-<script>
-
-</script><div class="col-sm-7">
+<div class="col-sm-7">
     <p>
         Отвечено: <?=$stat['choice']?> из <?=$stat['all']?> (<?=$stat['ratioC']?>%)
     </p>
