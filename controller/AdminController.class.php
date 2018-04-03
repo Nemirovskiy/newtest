@@ -26,7 +26,7 @@ class AdminController extends PageController
                 }else{
                     Message::setError(MessageError::errorAddNotText);
                     //$this->errors .= "Не указан текст для добавления тестов.<br>";
-                    return 'addTest';
+                    return 'addtest';
                 }
             }
             // если нет файла - покажем ошибку
@@ -36,7 +36,7 @@ class AdminController extends PageController
                 if(empty($_SESSION['addTests'])){
                     Message::setError(MessageError::errorAddNotText);
                     //$this->errors .= "Нет текста для добавления тестов.<br>";
-                    return 'addTest';
+                    return 'addtest';
                 }
                 return 'addTestBD';
             }
