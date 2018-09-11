@@ -11,9 +11,9 @@ class Admin extends Page
      * @var string $regexpAnswer - регулярное выражение для поиска ответа
      * @var string $regexpRight - регулярное выражение для поиска правильного ответа
      */
-    protected static $regexpQuest = "#^[\s|\t]*[\#|№]+[\s|\t]*([0-9]*)(.*)$#u";
-    protected static $regexpAnswer = "#^[\s|\t]*([a-zA-Zа-яА-ЯёЁ\s]+)\)(.+)#u";
-    protected static $regexpRight = "#^[\s|\t]*([0-9]+)[\s\t]*([а-яА-Яa-zA-Z,\s]+)$#u";
+    protected static $regexpQuest = "#^\D*[\#№]+\D*(\d+)(.+)$#u";
+    protected static $regexpAnswer = "#^[\s\t]*([a-zA-Zа-яА-ЯёЁ\s]+)\)(.+)#u";
+    protected static $regexpRight = "#^[\s\t]*(\d+)[\s\t]*(\D+)$#u";
     /**
      * метод преобразования букв в порядковые номера
      * @param string $liter - входящий символ или строка
@@ -286,23 +286,7 @@ class Admin extends Page
         }
         return true;
     }
-    /**
-     * метод показа загруженных тестов для добавления в базу
-     */
-    /*protected function previewAddTest($preTest){
-        $template = 'addtest';
-        if($this->checkAddTheme()){
-            $_SESSION['addTests'] = $this->convertQuests($preTest);
-            foreach ($_SESSION as $key=>$item){
-                $$key = $item;
-            }
-            $template .= '_preview';
-        }
 
-        $errors = trim($this->errors,"<br>");
-        $message = trim($this->message,"<br>");
-        include VIEW_DIR_ADMIN.$template.'.php';
-    }*/
     public function getContentAddtest(){
         $theme = Test::getThemeList();
         return ['theme'=>$theme];
@@ -317,106 +301,11 @@ class Admin extends Page
             $result['count'] = count($tests);
             return $result;
         }
-        //$this->errors .= "Нет тестов для добавления<br>";
         Message::setError(MessageError::errorAddNotQuests);
         return false;
     }
-//    public function getContentAddTestBD(){
-//        echo "<pre>";
-//        print_r($_SESSION);
-//        var_dump();
-//        echo "</pre>";
-//        if($this->insertAddTest()){
-//
-//        }
-//        return [];
-//    }
+
     public function getContentAdmin(){
         return [];
     }
-      /**
-     * метод подготовки отображения основной части станицы
-     * @param string $template
-     */
-    protected function prepareBody($template)
-    {
-        // список ситуационных страниц
-        $pages = [
-          'previewAddTest'=>'addtest_preview',
-          'addTest'=>'addtest',
-          'addTestBD'=>'addtest'
-        ];
-        $case = $this->separation();
-        if($case === false) $case = $this->code;
-        // страница отображения
-        // - если есть в ситуационных страницах
-        // - если нет - то по коду текущей страницы
-        $page = isset($pages[$case]) ? $pages[$case] : $this->code;
-        echo "<pre>";
-        //print_r($case);
-        echo "</pre>";
-        $execute = 'build'.ucfirst($case);
-        $content = $this->$execute();
-        // загружаем сообщения и ошибки
-        $errors = trim($this->errors,"<br>");
-        $message = trim($this->message,"<br>");
-        // если контент вернул ложь
-        // - значит ошибка,
-        // отобразить текущую страницу
-        if($content === false || empty($content)){
-            $execute = 'build'.ucfirst($this->code);
-            $content = $this->$execute();
-            $page = $this->code;
-        }
-        foreach ($content as $key=>$item){
-            $$key = $item;
-        }
-        //print_r($content);
-        echo "</pre>";
-        include VIEW_DIR_ADMIN.$page.'.php';
-        /*
-        $theme = Test::getThemeList();
-        $preTest = $this->prepareQuests();
-
-        if($preTest && $template === "addtest"){
-            $this->previewAddTest($preTest);
-        }
-        elseif (isset($_POST['code'][0])){
-            $code = strip_tags($_POST['code'][0]);
-            $page = new Test();
-            $tests = $page->getTest($code);
-            include VIEW_DIR_ADMIN."test_list.php";
-        }
-        elseif(isset($_POST['submit'])) {
-            $this->insertAddTest();
-            $errors = trim($this->errors,"<br>");
-            $message = trim($this->message,"<br>");
-            include VIEW_DIR_ADMIN.$template.'.php';
-        }
-        else
-            {
-            $errors = trim($this->errors,"<br>");
-            $message = trim($this->message,"<br>");
-            include VIEW_DIR_ADMIN.$template.'.php';
-        }*/
-       // echo " == $message ==";
-    }
-
-//	public function renderHtml($code)
-//	{
-//	    // проверяем на корректность адрес
-//	    $valid = $this->validAdress($code);
-//	    // подготавливаем голову
-//        $this->prepareHead($code);
-//        // если адрес корректный - подготовим контент
-//        if($valid){
-//            $this->prepareBody($code);
-//        }
-//        // иначе - отобразим старницу ошибки
-//        else {
-//            include VIEW_DIR_ERORS.'404.php';
-//        }
-//        // подключим низ страницы
-//        include VIEW_DIR_INCLUDE.'footer.php';
-//	}
 }
