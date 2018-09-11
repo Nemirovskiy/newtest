@@ -96,6 +96,12 @@ class Controller
         }
     }
 
+    /**
+     * метод выборки из массива по ключу
+     * @param array $array массив из которого выбрать
+     * @param string $key ключ для выборки
+     * @return array
+     */
     public static function keyArray($array=[],$key=''){
         foreach ($array as $item){
             $result[$item[$key]] = $item;

@@ -23,7 +23,11 @@ class Page extends Model
         $this->code = $code;
     }
 
-    // получаем список страниц из БД
+    /**
+     * получаем список страниц
+     * @param string $menu
+     * @return array|bool
+     */
     public static function getList($menu = "menu")
     {
         if(self::$list === null){
