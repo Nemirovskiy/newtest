@@ -239,7 +239,7 @@ class Test extends Page
             foreach ($arr as $item){
                 $list[$item['theme_code']]['code']  = $item['theme_code'];
                 $list[$item['theme_code']]['text']  = $item['theme_text'];
-                $list[$item['theme_code']]['count'] = $item['theme_count'];
+                $list[$item['theme_code']]['count'] = DBase::getThemeCount($item['theme_code']);
             }
             return self::$list = $list;
         }

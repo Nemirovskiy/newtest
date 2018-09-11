@@ -53,30 +53,26 @@ class DBase
             "WHERE quest.quest_id = answ.quest_id AND quest.theme_code = ?; ".
             "UPDATE theme SET theme.theme_count = 0 WHERE theme.theme_code = ?;";
         $result = self::baseConnect()->prepare($query);
-        //if($result->execute([$theme]))
-            return $result->execute([$theme,$theme]);
-        //else
-        //    return false;
+        return $result->execute([$theme,$theme]);
     }
-    public static function updateThemeCount($theme,$count=0){
-        $query = "UPDATE theme SET theme.theme_count = ? WHERE theme.theme_code = ?;";
+    public static function getThemeCount($theme){
+        $query = "SELECT COUNT(*) count FROM `quest` WHERE  theme_code = ?";
         $result = self::baseConnect()->prepare($query);
-       // if()
-            return $result->execute([$count,$theme]);
-//        else
-//            return false;
+        $result->execute([$theme]);
+        $count  = $result->fetch();
+        return $count['count'];
     }
 
     /**
      * @param $theme
      * @return bool
-     * INSERT INTO `theme` (`theme_code`, `theme_text`, `theme_count`) VALUES ('eee', 'ddd', '111')
+     * INSERT INTO `theme` (`theme_code`, `theme_text`) VALUES ('eee', 'ddd', '111')
      */
     public static function insertTheme($theme){
-        $query = "INSERT INTO `theme` (`theme_code`, `theme_text`, `theme_count`) ".
-            "VALUES (?, ?, ?)";
+        $query = "INSERT INTO `theme` (`theme_code`, `theme_text`) ".
+            "VALUES (?, ?)";
         $result = self::baseConnect()->prepare($query);
-        if($result->execute([$theme['code'],$theme['name'],$theme['count']]))
+        if($result->execute([$theme['code'],$theme['name']]))
             return true;
         else
             return false;

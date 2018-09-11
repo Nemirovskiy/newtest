@@ -192,8 +192,7 @@ class Admin extends Page
             else{
                 $theme = [
                     'code'=>$code,
-                    'name'=>$_SESSION['theme']['name'],
-                    'count'=> 0
+                    'name'=>$_SESSION['theme']['name']
                 ];
                 if(DBase::insertTheme($theme)){
                     //$this->message .= "Добавлена тема ".$theme['code']." - ". $theme['name']."<br>";
@@ -232,11 +231,6 @@ class Admin extends Page
                         return false;
                     }
                 }
-            }
-            if(!DBase::updateThemeCount($code,$count)){
-                //$this->errors .= "Ошибка обновления темы<br>";
-                Message::setError(MessageError::errorAddUpdateTheme);
-                return false;
             }
         }catch (Exception $e){
             echo "Ошибка записи в базу: ".$e;
