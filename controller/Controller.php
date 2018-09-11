@@ -6,14 +6,24 @@ require_once 'controller/settings.php';
 // подключаем автозагрузку классов
 require_once 'controller/autoload.php';
 
+/**
+ * метод отладки
+ * @param mixed
+ */
+function _pre($val){
+    echo "<pre>";
+    print_r($val);
+    echo "</pre>";
+}
 
+(new Controller())->start();
 // метод определения адрес - шаблон или тема теста
-$code = Controller::urlDetector();
-$class = $code.'Controller';
-//print_r($url);
-// создаем объект страницу или тест
-$page = new $class;
-$page->render();
+//$code = Controller::urlDetector();
+//$class = $code.'Controller';
+////print_r($url);
+//// создаем объект страницу или тест
+//$page = new $class;
+//$page->render();
 // передаем данные представлению
 /**
  * 0. Определяем класс страницы
@@ -38,5 +48,6 @@ $page->render();
 //}else{
 //    $page->renderJson($url[1]);
 //}
-?>
+
+
 

@@ -43,7 +43,7 @@ class TestController extends PageController
         elseif (isset($_POST['reset'])){
             Test::cleanStat(self::$code);
         }
-        if(count($_SESSION['log'][$theme]) == $count){
+        if(count($_SESSION['log'][$theme]) >= $count){
             // отвечены все вопросы
             // показать результат
             return 'result';

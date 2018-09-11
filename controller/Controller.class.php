@@ -8,10 +8,26 @@
  */
 class Controller
 {
+    public static $user = null;
     static protected $code = 'index';
     static protected $class = 'Page';
 
-    // метод определяет по адресу страница или тест
+    public function start(){
+        // метод определения адрес - шаблон или тема теста
+        $code = Controller::urlDetector();
+        $class = $code.'Controller';
+//print_r($url);
+// создаем объект страницу или тест
+        $page = new $class;
+        $page->render();
+        //Controller::dump($_SERVER);
+// передаем данные представлению
+    }
+
+    /**
+     * метод определяет по адресу страница или тест
+     * @return string
+     */
     public static function urlDetector()
     {
         // забираем параметр из строки адреса, если пусто - главная
@@ -32,6 +48,13 @@ class Controller
             self::$code = '404';
             // если есть файл шаблна - это статичная страница
         }
+        self::isAccess();
+
+        if(!empty($_POST['login'])){
+            $user = new User();
+            $user->createUser();
+            $user->authUser();
+        }
         return self::$class;
 
     }
@@ -41,7 +64,7 @@ class Controller
     protected static function validAddress(){
         foreach (Page::getList() as $page){
             $code = self::$code;
-            if($code == $page['code'] || $code == 'index'){
+            if(($code == $page['code'] || $code == 'index') && $code != 404){
                 return true;
             }
         }
@@ -57,7 +80,41 @@ class Controller
      * точка входа
      */
     public function render(){}
+
     /**
-     * метод формирования заголовка и верхней части страницы
+     * метод проверки доступа
      */
+    public static function isAccess(){
+        $page = Page::getList()[self::$code];
+        if($page['access'] <= User::getAccess()){
+            return true;
+        }
+        else{
+            self::$code = 403;
+            self::$class = 'Page';
+            return true;
+        }
+    }
+
+    public static function keyArray($array=[],$key=''){
+        foreach ($array as $item){
+            $result[$item[$key]] = $item;
+        }
+        return $result;
+    }
+
+    public static function dump($item){
+        if(empty($_POST['ajax'])){
+            echo "<pre>";
+            print_r($item);
+            echo "</pre>";
+        }else{
+//            ob_start();
+//            print_r($item);
+//            $str = ob_get_contents();
+//            ob_end_clean();
+//            echo json_encode($item);
+        }
+
+    }
 }

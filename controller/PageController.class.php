@@ -28,17 +28,15 @@ class PageController extends Controller
         $content = array_merge($content,$head);
         $content['message'] = Message::get();
         // выбираем шаблон
-        $template = (self::$code == 404) ? VIEW_DIR_ERORS.'404.php' : VIEW_DIR_PAGE.self::$code.'.php';
-//        if(empty($_POST['ajax']))
-            $this->getView($template,$content);
-//        else
-//            $this->getAjax($content);
+        $errors = [404,403];
+        $template = (in_array(self::$code,$errors)) ? VIEW_DIR_ERORS.self::$code.'.php' : VIEW_DIR_PAGE.self::$code.'.php';
+        $this->getView($template,$content);
     }
 
     protected function getAction()
     {
-        if(self::$code == 404){
-            return '404';
+        if(self::$code == 404 || self::$code == 403){
+            return self::$code;
         }else{
             return self::$class;
         }
