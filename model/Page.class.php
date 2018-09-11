@@ -27,8 +27,7 @@ class Page extends Model
     public static function getList($menu = "menu")
     {
         if(self::$list === null){
-            $list = DBase::select("SELECT * FROM page ORDER BY $menu");
-            self::$list = Controller::keyArray($list,'code');
+            self::$list = DBase::getList($menu);
         }
         return self::$list;
     }

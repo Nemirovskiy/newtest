@@ -53,6 +53,13 @@ class User
         }
     }
 
+    private function verifyUser($login,$password){
+        $user = DBase::getUser($login);
+        if($user)
+            if(password_verify($password,$user['pass']))
+                return $user;
+        return false;
+    }
     /**
      * метод авторизации пользователя
      * @return bool
@@ -61,10 +68,9 @@ class User
         if(empty($_SESSION['user'])){
             $login = strip_tags($_POST['login']);
             $pass = strip_tags($_POST['pass']);
-            $passDB = DBase::getPass($login);
-            if(password_verify($pass,$passDB)){
+            $user = $this->verifyUser($login,$pass);
+            if($user){
                 Message::setMessage('успех авторизации');
-                $user = DBase::select("SELECT * FROM `user` WHERE login = ?",[$login])[0];
                 $_SESSION['user'] = [
                     'login'  => $user['login'],
                     'email'  => $user['email'],

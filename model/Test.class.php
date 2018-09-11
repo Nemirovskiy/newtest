@@ -88,7 +88,7 @@ class Test extends Page
      */
     public function getContentTest(){
         $_SESSION['current']['code'] = $code = $this->code;
-        $test = $this->getTest($code,$this->generateNumberQuest());
+        $test = DBase::getTest($code,$this->generateNumberQuest());
         $test['code'] = $code;
         $test['stat'] = $this->getStat();
         $_SESSION['current'] = $test;
@@ -175,48 +175,6 @@ class Test extends Page
     */}
 
     /**
-     * Метод получения вопроса и ответа из указанной темы и указанного номера вопроса
-     * @param $theme
-     * @param $number
-     * @param bool $rnd
-     * @return array|bool
-     */
-    public function getTest($theme,$number = false,$rnd = false){
-        if($number === false)
-            $where = " > 0";
-        else
-            $where = " = ?";
-        $query = "SELECT * from quest INNER JOIN theme ON ".
-            "(quest.theme_code = theme.theme_code)".
-            "INNER JOIN answ ON (quest.quest_id = answ.quest_id) ".
-            "WHERE theme.theme_code = ? AND quest_number" . $where;
-        if($number === false)
-            $tests = DBase::select($query,[$theme]);
-        else
-            $tests = DBase::select($query,[$theme,$number]);
-        if(empty($tests)) return false;
-        $result =[];
-        foreach ($tests as $key => $item){
-            if(!isset($result['number'])) $result[$item['quest_number']]['number'] = $item['quest_number'];
-            if(!isset($result['quest'])) $result[$item['quest_number']]['quest'] = $item['quest_text'];
-            if(!isset($result['theme'])) $result[$item['quest_number']]['theme'] = $item['theme_text'];
-            $result[$item['quest_number']]['answers'][] = [
-                'order'=> $item['answ_order'],
-                'right' => $item['answ_right'],
-                'text' => $item['answ_text']
-            ];
-
-            if($item['answ_right'] == 1) $result[$item['quest_number']]['right'][] = $item['answ_order'];
-
-        }
-        if($number !== false){
-            $result = $result[$item['quest_number']];
-        }
-        if($rnd) shuffle($result['answers']);
-        return $result;
-    }
-
-    /**
      * структура хранения вопросов в сессии
      *
      * запись при ответе:
@@ -235,15 +193,8 @@ class Test extends Page
 
     public static function getThemeList(){
         if(self::$list === null){
-            $arr = DBase::select("SELECT * FROM theme ");
-            foreach ($arr as $item){
-                $list[$item['theme_code']]['code']  = $item['theme_code'];
-                $list[$item['theme_code']]['text']  = $item['theme_text'];
-                $list[$item['theme_code']]['count'] = DBase::getThemeCount($item['theme_code']);
-            }
-            return self::$list = $list;
+            self::$list = DBase::getThemeList();
         }
-        else
-            return self::$list;
+        return self::$list;
     }
 }
