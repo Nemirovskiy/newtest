@@ -4,84 +4,98 @@
  */
 ?>
 
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-    <li class="nav-item">
-        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#addtest" role="tab" aria-controls="home" aria-selected="true">Добавление</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Редактор</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Страницы</a>
-    </li>
-</ul>
-<div class="tab-content" id="myTabContent">
-    <div class="tab-pane fade show active" id="addtest" role="tabpanel" aria-labelledby="home-tab">
-        <form class="form-group row mt-3" method="POST" enctype="multipart/form-data" id="addForm">
-            <div class="col-sm-12 row">
-                <label class="col-sm-2 col-form-label" for="inputTheme">Тема</label>
-                <select id="inputTheme" name="addCode" class="form-control col-sm-3">
-                    <option selected value="new">Новая</option>
-                    <? foreach ($theme as $item): ?>
-                        <option value="<?=$item['code']?>"><?=$item['text']?></option>
-                    <? endforeach; ?>
-                </select>
-                <div id="newTheme" class="col-sm-7 row">
-                    <!--                <div class="">-->
-                    <input type="text" class="form-control col-sm-5 ml-2" name="newCode" id="newThemeCode" placeholder="код темы">
-                    <!--                </div>-->
-                    <!--                <div class="">-->
-                    <input type="text" class="form-control col-sm-6 ml-2" name="newName" id="newThemeName" placeholder="Название темы">
-                    <!--                </div>-->
-                </div>
-            </div>
-
-            <div class="col-sm-12 mt-2">
-                <p class="textNewTheme mb-1 text-center" id="textNewTeme"></p>
-            </div>
-            <div class="col-sm-8 row mt-0 mb-2 mx-auto justify-content-center">
-                <label class="btn col-sm-5 mr-2 btn-outline-primary" for="buttonFile">Выбрать файл</label>
-                <input style="display: none;" type="file" name="file"  accept="text/plain" id="buttonFile">
-                <input type="button" id="buttonText" name="onText"
-                       class="btn col-sm-5 ml-2 btn-outline-primary" value="Вставить текст">
-            </div>
-            <div class="col-sm-12">
-                <p class="textNewTheme mb-1 text-center" id="textFileTeme"></p>
-                <textarea disabled  name="text" id="textArea" class="form-control addText"
-                          placeholder="<?="Образец:\n#1 ОСНОВОЙ АСЕПТИКИ ЯВЛЯЕТСЯ:\nа)"
-                          ." дезинфекция;\nб) предстерилизационная очистка;\n"
-                          ."в) стерилизация\n\n№2 ПОСЛЕ СНЯТИЯ ПЕРЧАТОК НЕОБХОДИМО:\n".
-                          "а) провести гигиеническую обработку рук;\n".
-                          "б) сполоснуть руки под проточной водой;\n".
-                          "\n1 а\n2 а"
-
-                          ?>"></textarea>
-            </div>
-            <div class="col-sm-10 row  mx-auto mt-2">
-                <input type="submit" id="buttonAddTest" name="addTest"
-                       class="btn btn-outline-primary col-sm-6 mx-auto" value="Добавить">
-            </div>
-        </form>
-
+<form class="form-group row mt-3" method="POST" enctype="multipart/form-data" id="addForm" novalidate>
+    <div class="col-sm-12 row justify-content-center">
+        <div class="col-sm-6 row">
+            <label class="col col-form-label" for="inputTheme">Тема</label>
+            <select id="inputTheme" name="addCode" class="col-8 form-control">
+                <option selected value="new">Новая</option>
+                <? foreach ($theme as $item): ?>
+                    <option value="<?=$item['code']?>"><?=$item['text']?></option>
+                <? endforeach; ?>
+            </select>
+        </div>
+        <div id="newTheme" class="col-sm-6 row ml-sm-2 mt-2 mt-sm-0">
+            <input required type="text" class="form-control col-4" name="newCode" id="newThemeCode" placeholder="код">
+            <input required type="text" class="form-control col ml-1" name="newName" id="newThemeName" placeholder="название темы">
+            <span class="invalid-feedback">
+                Введите код и название новой темы
+            </span>
+        </div>
     </div>
-    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
-    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
-</div>
+    <div class="col-sm-12 mt-2">
+        <p class="textNewTheme mb-1 text-center" id="textNewTeme"></p>
+    </div>
+    <div class="col-sm-10 input-group mt-0 mb-2 mx-auto justify-content-center" id="buttonGroup">
+        <label class="btn col-md-5  btn-outline-primary form-control col-form-label" for="buttonFile">
+            Выбрать файл
+        </label>
+        <label for="textArea" id="buttonText" class="btn col-md-5  btn-outline-primary form-control col-form-label">
+            Вставить текст
+        </label>
+    </div>
+    <div class="invalid-feedback  fileTextButton-feedback text-center">
+        Выберите файл или вставте текст
+    </div>
+    <div class="col-sm-12">
+        <p class="textNewTheme mb-1 text-center" id="textFileTeme"></p>
+        <input required style="display: none;" type="file" name="file"  accept="text/plain" id="buttonFile">
+        <textarea required disabled name="text" id="textArea" class="col-sm-12 form-control addText"
+                  placeholder="<?="Образец:\n#1 ОСНОВОЙ АСЕПТИКИ ЯВЛЯЕТСЯ:\nа)"
+                  ." дезинфекция;\nб) предстерилизационная очистка;\n"
+                  ."в) стерилизация\n\n№2 ПОСЛЕ СНЯТИЯ ПЕРЧАТОК НЕОБХОДИМО:\n".
+                  "а) провести гигиеническую обработку рук;\n".
+                  "б) сполоснуть руки под проточной водой;\n".
+                  "\n1 а\n2 а"
+
+                  ?>"></textarea>
+    </div>
+    <button type="submit" id="buttonAddTest" name="addTest"
+            class="btn btn-outline-primary col-sm-6 mx-auto">Подготовить к добавлению</button>
+</form>
+
 
 <script>
+    /**
+     * функция проверки формы добавления тестов
+     * 1 - проверяем код-название, если выбрана новая тема
+     * 2 - проверка наличия файла-текста
+     *
+     * @param e - событие отправки формы
+     */
+    function addFormValidate(e){
+        /** 1. */
+        if($('#inputTheme').val() === 'new'){
+            $('#newTheme').addClass('was-validated');
+        }
+        /** проветить если есть значение при изменении текста-файла */
+
+        if($('#addForm [type="file"]').val().length <= 0 && $('#addForm textarea').val().length <= 0 ){
+            $('#buttonGroup label').addClass('btn-outline-danger');
+            $('.fileTextButton-feedback').show();
+        }
+        /** если есть незаполенные поля - не отправлять форму */
+        if($(this).find(':invalid').length > 0 ){
+            e.preventDefault();
+        }
+
+    }
+
     $(function () {
+        $('#addForm').on('submit',addFormValidate);
+
         $("#inputTheme").on("input",function () {
             if($(this).val() === 'new'){
-                $('#newTheme').show(500);
-                $('#newTheme input').prop('disabled',false);
-                $('#textNewTeme').text('');
+                $('#newTheme input').prop('disabled',false).val('');
+                $('#textNewTeme').text('Введите код и название новой темы');
             }
             else {
-                $('#newTheme').hide(500);
-                $('#newTheme input').prop('disabled',true);
+                $('#newTheme [name="newCode"]').val($(this).val()).prop('disabled',true);
+                $('#newTheme [name="newName"]').val($(this.selectedOptions).text()).prop('disabled',true);
                 $('#textNewTeme').text('Будет обновлена тема '+$("#inputTheme option:selected").text());
             }
         });
+
         $('#newTheme').on('input','input',function () {
             var name = $('#newThemeName').val();
             var code = $('#newThemeCode').val();
@@ -91,44 +105,33 @@
             else
                 $('#textNewTeme').text('');
         });
+
         $('#buttonText').on('click',function () {
             $('#textArea').toggle();
             if($('#textArea').is(':hidden')){
                 $('#textArea').prop('disabled',true);
-                $('#buttonText').val('Вставить текст');
-                $('#buttonFile').prop('disabled',false);
+                $('#buttonText').text('Вставить текст');
+                $('#buttonFile').val('').prop('disabled',false);
                 $('[for=\'buttonFile\']').removeClass('disabled');
             }
             else{
-                $('#textArea').prop('disabled',false);
-                $('#buttonText').val('Убрать текст');
+                $('#textArea').prop('disabled',false).focus();
+                $('#buttonText').text('Убрать текст');
                 $('#buttonFile').prop('disabled',true);
                 $('[for=\'buttonFile\']').addClass('disabled');
                 $('#textFileTeme').text('');
+                $('#buttonGroup label').removeClass('btn-outline-danger');
+                $('.fileTextButton-feedback').hide();
             }
         });
+
+        // вывод сообщения о выбранном файле
         $('#buttonFile').on('change',function () {
             $('#textFileTeme').text('Вставим тесты из файла ' + $(this).val().split("\\").pop());
-            $(this).removeClass('btn-outline-danger');
+            $('#buttonGroup label').removeClass('btn-outline-danger');
+            $('.fileTextButton-feedback').hide();
         });
+    });
 
-        $('#addForm').on('submit',function (e) {
-            var flag = true;
-            $('#addForm input, #addForm select, #addForm textarea')
-                .not(':disabled, [type=\'submit\'], [type=\'submit\']').each(function () {
-                if($(this).val().length < 1){
-                    $(this).addClass('is-invalid');
-                    $(this).prev('label').addClass('btn-outline-danger');
-                }else{
-                    $(this).removeClass('is-invalid');
-                    $(this).prev('label').removeClass('btn-outline-danger');
-                }
-                if($(this).val().length < 1 && flag)
-                    flag = false;
-            });
-            if(!flag)
-                e.preventDefault();
-        })
-    })
 </script>
 </div>

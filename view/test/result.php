@@ -1,4 +1,3 @@
-<h1>Вопросы по теме <?=$theme?></h1>
 <div id="messageTest" class="testMessage col-sm-5">
     <?if(!empty($message['test'])):?>
         <div class="alert alert-primary" role="alert" >
@@ -12,9 +11,9 @@
     <div id="main" class="col-sm-12" >
         <h3>Вы ответили на все вопросы в этой теме.</h3>
     </div>
-    <div class="col-sm-8 row mx-auto justify-content-center" >
-        <input id='submit' class="btn m-2 col-5 col-sm-5 btn-outline-primary" type='submit' value='Ok'>
-    </div>
+<!--    <div class="col-sm-8 row mx-auto justify-content-center" >-->
+<!--        <input id='submit' class="btn m-2 col-5 col-sm-5 btn-outline-primary" type='submit' value='Ok'>-->
+<!--    </div>-->
 </form>
 <div class="col-sm-7" id="statistic">
     <p>

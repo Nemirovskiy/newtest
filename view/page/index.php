@@ -1,12 +1,6 @@
-<div class='cntr'>
-
-	<span itemprop="description">
-		Неофициальный сайт студентов-фельдшеров 
-		<br>
-		«Центра последипломного образования специалистов медицинского профиля»
-	</span>
+<div class='text-center'>
 	<h3>Скачать учебный материал:</h3>
-	<a href='ECG.pdf'>Экг под силу каждому</a>
+	<a href='/ECG.pdf'>Экг под силу каждому</a>
 	<br>
 	<br>
 	<a href='http://www.cpksmo.ru/vibtes.php'>Сайт Училища с тестами</a>
@@ -20,7 +14,7 @@
 	<br>
 	 © Николай
 	 <br>
-	 <a href='mailto:it-nikola@mail.ru'>it-nikola@mail.ru</a>
+	 <a href='mailto:admin@feldtest.ru'>admin@feldtest.ru</a>
 	<br>
 	<p>По вопросам работы этого сайта</p>
 	<p>предложения жду на указанную почту</p>
