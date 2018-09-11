@@ -120,8 +120,20 @@ class Test extends Page
     }
 
     /**
+     * метод установки заголовка страницы теста
+     * @return string
+     */
+    function setHeader()
+    {
+        // получаем список страниц
+        $code = $this->code;
+        $tests = Test::getThemeList();
+        return MessageTest::header.$tests[$code]['text'];
+    }
+
+    /**
      * Метод подготовки основной части страницы
-     * @param string $testTheme - тема теста
+     *
      */
 
     public function renderJson($code){/*

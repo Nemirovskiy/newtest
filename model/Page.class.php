@@ -26,8 +26,10 @@ class Page extends Model
     // получаем список страниц из БД
     public static function getList($menu = "menu")
     {
-        if(self::$list === null)
-            self::$list = DBase::select("SELECT * FROM page ORDER BY $menu");
+        if(self::$list === null){
+            $list = DBase::select("SELECT * FROM page ORDER BY $menu");
+            self::$list = Controller::keyArray($list,'code');
+        }
         return self::$list;
     }
 	// метод формирования меню
@@ -42,14 +44,35 @@ class Page extends Model
 		        if($value['code'] == $this->code){
                      $nav[$key]['active'] = true;
                 }
-                // если код текущей старницы index - ссылка будет без кода
+                // если код текущей страницы index - ссылка будет без кода
                 if($nav[$key]['code'] == 'index') $nav[$key]['code']='';
             }
 		}
         $this->nav = $nav;
 		return $nav;
 	}
-	// метод возвращения заголовка
+	// метод формирования второго меню
+	protected function setSecondMenu()
+	{
+	    // получаем список страниц
+		$pages = self::getList();
+		$nav = [];
+		foreach ($pages as $value) {
+		    if($value['access'] <= User::getAccess() && $value['second_menu'] > 0) {
+		        $key = $value['second_menu'];
+		        $nav[$key] = $value;
+		        if($value['code'] == $this->code){
+                     $nav[$key]['active'] = true;
+                }
+                // если код текущей старницы index - ссылка будет без кода
+                if($nav[$key]['code'] == 'index') $nav[$key]['code']='';
+            }
+		}
+        //$this->nav = $nav;
+        ksort($nav);
+		return $nav;
+	}
+	// метод возвращения титла
 	private function setTitle()
 	{
 	    // получаем список страниц
@@ -57,18 +80,43 @@ class Page extends Model
 		$code = $this->code;
 		foreach ($pages as $item){
 		    if($item['code'] == $code){
-                // $this->title = $item['title'];
 		        return $item['title'];
             }
         }
 	}
+	// метод возвращения заголовка
+	protected function setHeader()
+	{
+	    // получаем список страниц
+		$pages = self::getList();
+		$code = $this->code;
+		foreach ($pages as $item){
+		    if($item['code'] == $code){
+		        if($item['header'] === null)
+		            return $item['title'];
+		        else
+		            return $item['header'];
+            }
+        }
+	}
 
+	protected function getButtonAccept(){
+        if(isset($_POST['accept']))
+            return $_SESSION['accept'] = true;
+        elseif ($_SESSION['accept'])
+            return true;
+        else
+            return false;
+    }
     /**
      * метод формирования основного контента страницы
      */
     public function getContentPage(){
         $result['nav'] = $this->setMenu();
+        $result['secondNav'] = $this->setSecondMenu(User::getAccess());
         $result['title'] = $this->setTitle();
+        $result['header'] = $this->setHeader();
+        $result['accept'] = $this->getButtonAccept();
         return $result;
     }
     /**
@@ -78,41 +126,12 @@ class Page extends Model
         header("HTTP/1.0 404 Not Found");
         return $this->getContentPage();
     }
-    /***
-     * метод подготовки контента
-     */
-
-    protected function getContent(){
-
-        $result['head']  = $this->prepareHead();
-        $result['content'] = $this->prepareBody();
-        return $result;
-    }
     /**
-     * Функция подготовки основной части страницы
-     * @param string $template - название шаблона
+     * метод формирования 403 страницы
      */
-    protected function prepareBody($template)
-	{
-		    include VIEW_DIR_PAGE.$template.'.php';
-	}
-	public function renderHtml($code,$content)
-	{
-        include VIEW_DIR_INCLUDE.'head.php';
-	    // проверяем на корректность адрес
-	    //$valid = $this->validAdress($code);
-	    // подготавливаем голову
-        $this->prepareHead($code);
-        // если адрес корректный - подготовим контент
-        if($code == 404){
-            $this->prepareBody($code);
-        }
-        // иначе - отобразим старницу ошибки
-        else {
-            include VIEW_DIR_ERORS.'404.php';
-        }
-        // подключим низ страницы
-        include VIEW_DIR_INCLUDE.'footer.php';
-	}
+    public function getContent403(){
+        header("HTTP/1.0 403 Forbidden");
+        return $this->getContentPage();
+    }
 
 }

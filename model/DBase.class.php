@@ -116,4 +116,25 @@ class DBase
         else
             return false;
     }
+
+    /**
+     *
+     */
+    public static function createUser($login,$pass){
+        $query = "INSERT INTO `user` (`login`,`pass`) VALUES (?,?)";
+        $result = self::baseConnect()->prepare($query);
+        if($result->execute([$login,$pass]))
+            return true;
+        else
+            return false;
+    }
+
+    public static function getPass($login){
+        $query = "SELECT `pass` FROM `user` WHERE login = ?";
+        $res = self::baseConnect()->prepare($query);
+        if($res->execute([$login]))
+            return $res->fetch()['pass'];
+        else
+            return false;
+    }
 }
