@@ -37,8 +37,8 @@ class DBase
      * @param array $param
      * @return array|bool
      */
-    private static function select($query,$param=[]){
-        $result = self::query($query);
+    private static function select($query){
+        $result = self::baseConnect()->query($query);
         if($result){
             return $result->fetchAll();
         }
@@ -167,7 +167,7 @@ class DBase
     public static function insertAddQuest($param=[]){
         $query = "INSERT INTO `quest` (`theme_code`, `quest_number`, `quest_text`) ".
             "VALUES (?,?,?)";
-        return self::insert($query,$param,true);
+        return self::insert($query,$param);
     }
     /**
      * Запись ответа
@@ -177,7 +177,7 @@ class DBase
     public static function insertAddAnswer($param=[]){
         $query = "INSERT INTO `answ` (`quest_id`, `answ_order`, `answ_right`, `answ_text`) ".
             "VALUES (?,?,?,?)";
-        return self::insert($query,$param,true);
+        return self::insert($query,$param);
     }
 
     /**
