@@ -5,7 +5,6 @@
 
 class DBase
 {
-    private static $db;
     private static $connect = null;
     private function __construct(){}
 
@@ -37,8 +36,9 @@ class DBase
      * @param array $param
      * @return array|bool
      */
-    private static function select($query){
-        $result = self::baseConnect()->query($query);
+    private static function select($query,$param = []){
+        $result = self::baseConnect()->prepare($query);
+        $result->execute($param);
         if($result){
             return $result->fetchAll();
         }
@@ -188,7 +188,7 @@ class DBase
      * @return bool|string
      */
     public static function createUser($login,$pass,$email=''){
-        $query = "INSERT INTO `user` (`login`,`pass`) VALUES (?,?)";
+        $query = "INSERT INTO `user` (`login`,`pass`,`email`) VALUES (?,?,?)";
         return self::insert($query,[$login,$pass,$email]);
     }
 
@@ -201,7 +201,7 @@ class DBase
         $query = "SELECT * FROM `user` WHERE login = :login OR email = :login ";
         $result = self::select($query,['login'=>$login]);
         if($result)
-            return $result;
+            return $result[0];
         return false;
     }
 }
