@@ -14,7 +14,12 @@ class DBase
      */
     private static function baseConnect(){
         if(self::$connect === null){
-            self::$connect = new PDO("mysql:host=localhost;dbname=".BD_NAME,BD_LOGIN,BD_PASS);
+            try{
+                self::$connect = new PDO("mysql:host=localhost;dbname=".BD_NAME,BD_LOGIN,BD_PASS);
+            }catch (Exception $e){
+                Message::setError(MessageError::errorDB);
+                Controller::errorServer($e->getMessage());
+            }
         }
         return self::$connect;
     }

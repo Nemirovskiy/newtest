@@ -97,6 +97,21 @@ class Controller
     }
 
     /**
+     * метод обработки ошибок сервера
+     * генерирует страницу ошибки 500
+     * передает сообщение об ошибке
+     * если разрешено, записывает сообщение в лог
+     */
+    public static function errorServer($message = ''){
+        self::$code = 500;
+        self::$class = 'Page';
+        if(LOG_TO_FILE)
+            Log::toFile(MessageError::errorDB.": ".$message);
+        $page = new PageController();
+        $page->render500();
+    }
+
+    /**
      * метод выборки из массива по ключу
      * @param array $array массив из которого выбрать
      * @param string $key ключ для выборки

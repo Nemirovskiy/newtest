@@ -9,6 +9,9 @@ define('VIEW_DIR_ERORS', 'view/errors/');
 /// пути классов
 define('CLASS_DIR_CONTROLLER', 'controller/');
 define('CLASS_DIR_MODEL', 'model/');
+// настройка для логов
+define('LOG_PATH', 'log/');
+define('LOG_TO_FILE', true);
 
 // настройка доступа к БД
 define('BD_NAME', 'feldtest');

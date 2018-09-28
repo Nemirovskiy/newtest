@@ -61,4 +61,21 @@ class PageController extends Controller
             echo json_encode($content);
         ob_end_flush();
     }
+
+    /**
+     * метод отображении ошибки сервера,
+     * должен работать без обращения к БД
+     */
+    public function render500()
+    {
+        $content = [
+            "nav" => [],
+            "secondNav" => [],
+            "title" => MessageError::errorServer,
+            "header" => MessageError::errorServer,
+            "message" => Message::get()
+        ];
+        $template = VIEW_DIR_ERORS.self::$code.'.php' ;
+        $this->getView($template,$content);
+    }
 }

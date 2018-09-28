@@ -3,6 +3,7 @@
 class MessageError extends Message
 {
     const errorDB = "Ошибка базы данных";
+    const errorServer = "Ошибка работы сервера";
     const errorAddQuest = "Ошибка добавления вопроса ";
     const errorPostData = "Ошибка полученных данных";
     const errorAddThemeCodeExist = "Нельзя указать для новой темы код существующей";
