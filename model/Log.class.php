@@ -26,10 +26,7 @@ class Log
                 for($x=0; $x < $tab; $x++, $result .= self::$indent);
                 $result .= "[$key]: ";
                 if(is_array($item)){
-                    if(self::valName($item) !== "GLOBALS")
                         $result .= self::scanArray($item,$tab);
-                    else
-                        $result .= "*recursive*".PHP_EOL;
                 }else{
                     $result .= self::type($item,$tab).PHP_EOL;
                 }
@@ -58,24 +55,6 @@ class Log
             return $data;
         }
     }
-    /**
-     * метод получения имени переменной
-     * @param mixed $data     - входящая переменная имя которой будем искать
-     * @return string - полученное значение переменной
-     */
-    private static function valName($data){
-        if($data !== $GLOBALS){
-            foreach ($GLOBALS as $key => $value){
-                if($value === $data){
-                    break;
-                }
-            }
-            if($key === "GLOBALS")
-                $key = '';
-        }elseif($data === $GLOBALS)
-            $key = "GLOBALS";
-        return $key;
-    }
 
     /**
      * метод подготовки входящего значения
@@ -83,11 +62,10 @@ class Log
      * @return string - сформированная строка
      */
     private static function prepare($data){
-        $result = "[".self::valName($data)."]:";
         if(is_array($data)){
-            $result .= self::scanArray($data);
+            $result = self::scanArray($data);
         }else{
-            $result .= self::type($data);
+            $result = self::type($data);
         }
         return $result;
     }
@@ -97,8 +75,7 @@ class Log
      * @param $data
      */
     public static function toFile($data){
-        $result = date("H:i:s").PHP_EOL;
-        $result .= self::prepare($data);
+        $result = date("H:i:s ") .self::prepare($data).PHP_EOL;
         file_put_contents(LOG_PATH.date("Y-m-d").".log",$result,FILE_APPEND);
     }
 
