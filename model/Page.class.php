@@ -136,5 +136,20 @@ class Page extends Model
         header("HTTP/1.0 403 Forbidden");
         return $this->getContentPage();
     }
+    /**
+     * метод формирования 500 страницы
+     */
+    public function getContent500(){
+        header("HTTP/1.0 500 Internal Server Error");
+        $content = [
+            "nav" => [],
+            "secondNav" => [],
+            "title" => MessageError::errorServer,
+            "header" => MessageError::errorServer
+        ];
+        if(SERVER_ERROR_TO_MESSAGE)
+            $content['message'] = Message::get();
+        return $content;
+    }
 
 }

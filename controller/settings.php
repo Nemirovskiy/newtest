@@ -12,6 +12,9 @@ define('CLASS_DIR_MODEL', 'model/');
 // настройка для логов
 define('LOG_PATH', 'log/');
 define('LOG_TO_FILE', true);
+// обработка ошибок сервера
+define('SERVER_ERROR_TO_LOG_FILE', true);
+define('SERVER_ERROR_TO_MESSAGE', true);
 
 // настройка доступа к БД
 define('BD_NAME', 'feldtest');

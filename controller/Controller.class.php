@@ -105,10 +105,11 @@ class Controller
     public static function errorServer($message = ''){
         self::$code = 500;
         self::$class = 'Page';
-        if(LOG_TO_FILE)
+        if(SERVER_ERROR_TO_LOG_FILE)
             Log::toFile(MessageError::get()['errors'].": ".$message);
         $page = new PageController();
-        $page->render500();
+        $page->render();
+        die();
     }
 
     /**

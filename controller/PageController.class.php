@@ -14,6 +14,7 @@ class PageController extends Controller
      * точка входа
      *
      */
+    private static $errors = [404,403,500];
     public function render()
     {
         $class = self::$class;
@@ -23,19 +24,29 @@ class PageController extends Controller
         $action = $this->getAction();
         $action = 'getContent'.ucfirst($action);
         // выполняем действие - получаем контент
-        $head = $page->getContentPage();
-        $content = $page->$action();
-        $content = array_merge($content,$head);
-        $content['message'] = Message::get();
+        if(self::$code != 500){
+            $head = $page->getContentPage();
+            $content = $page->$action();
+            $content = array_merge($content,$head);
+            $content['message'] = Message::get();
+        }else{
+            $content = [
+                "nav" => [],
+                "secondNav" => [],
+                "title" => MessageError::errorServer,
+                "header" => MessageError::errorServer
+            ];
+            if(!SERVER_ERROR_TO_MESSAGE)
+                $content['message'] = Message::get();
+        }
         // выбираем шаблон
-        $errors = [404,403];
-        $template = (in_array(self::$code,$errors)) ? VIEW_DIR_ERORS.self::$code.'.php' : VIEW_DIR_PAGE.self::$code.'.php';
+        $template = (in_array(self::$code,self::$errors)) ? VIEW_DIR_ERORS.self::$code.'.php' : VIEW_DIR_PAGE.self::$code.'.php';
         $this->getView($template,$content);
     }
 
     protected function getAction()
     {
-        if(self::$code == 404 || self::$code == 403){
+        if(in_array(self::$code,self::$errors)){
             return self::$code;
         }else{
             return self::$class;
@@ -72,9 +83,10 @@ class PageController extends Controller
             "nav" => [],
             "secondNav" => [],
             "title" => MessageError::errorServer,
-            "header" => MessageError::errorServer,
-            "message" => Message::get()
+            "header" => MessageError::errorServer
         ];
+        if(SERVER_ERROR_TO_MESSAGE)
+            $content['message'] = Message::get();
         $template = VIEW_DIR_ERORS.self::$code.'.php' ;
         $this->getView($template,$content);
     }
