@@ -106,7 +106,7 @@ class Controller
         self::$code = 500;
         self::$class = 'Page';
         if(LOG_TO_FILE)
-            Log::toFile(MessageError::errorDB.": ".$message);
+            Log::toFile(MessageError::get()['errors'].": ".$message);
         $page = new PageController();
         $page->render500();
     }
