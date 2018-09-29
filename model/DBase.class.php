@@ -31,8 +31,14 @@ class DBase
      * @return bool
      */
     private static function query($query,$param=[]){
-        $result = self::baseConnect()->prepare($query);
-        return $result->execute($param);
+        try{
+            $statement = self::baseConnect()->prepare($query);
+            $result =  $statement->execute($param);
+        }catch (Exception $e){
+            Message::setError(MessageError::errorDB);
+            Controller::errorServer($e->getMessage());
+        }
+        return $result;
     }
 
     /**
@@ -42,10 +48,15 @@ class DBase
      * @return array|bool
      */
     private static function select($query,$param = []){
-        $result = self::baseConnect()->prepare($query);
-        $result->execute($param);
-        if($result){
-            return $result->fetchAll();
+        try{
+            $result = self::baseConnect()->prepare($query);
+            $result->execute($param);
+            if($result){
+                return $result->fetchAll();
+            }
+        }catch (Exception $e){
+            Message::setError(MessageError::errorDB);
+            Controller::errorServer($e->getMessage());
         }
         return false;
     }
@@ -84,7 +95,11 @@ class DBase
             $tests = DBase::select($query,[$theme]);
         else
             $tests = DBase::select($query,[$theme,$number]);
-        if(empty($tests)) return false;
+
+        if(empty($tests)) {
+            Message::setError(MessageError::errorDB);
+            Controller::errorServer('empty $tests');
+        }
         $result =[];
         foreach ($tests as $item){
             if(!isset($result['number'])) $result[$item['quest_number']]['number'] = $item['quest_number'];
