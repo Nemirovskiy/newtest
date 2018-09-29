@@ -30,45 +30,24 @@ class Controller
      */
     public static function urlDetector()
     {
-        // забираем параметр из строки адреса, если пусто - главная
-        $url = explode("/",$_GET['t']);
-        $name = !empty($url[0]) ? strip_tags($url[0]) : 'index';
-        self::$code = $name;
-        if(self::validAddress()) {
-            if (is_file(VIEW_DIR_PAGE . $name . '.php'))
-                self::$class = 'Page';
-            // или административная
-            elseif (is_file(VIEW_DIR_ADMIN . $name . '.php'))
-                self::$class = 'Admin';
-            // иначе - это тест
-            else
-                self::$class = 'Test';
+        $inputUrl = $_GET['t'];
+        preg_match("/^[a-z\/]+$/",$inputUrl,$code);
+        $list = Page::getList();
+        if(empty($inputUrl)){
+            self::$code  = "index";
+        }elseif(empty($list[$code[0]])){
+            self::$code  = 404;
         }else{
-            self::$class = 'Page';
-            self::$code = '404';
-            // если есть файл шаблна - это статичная страница
+            self::$code  = $list[$code[0]]['code'];
+            self::$class = ucfirst($list[$code[0]]['type']);
         }
-        self::isAccess();
-
         if(!empty($_POST['login'])){
             $user = new User();
             $user->createUser();
             $user->authUser();
         }
+        self::isAccess();
         return self::$class;
-
-    }
-    /**
-     * метод проверки зарегистрированных страниц
-     */
-    protected static function validAddress(){
-        foreach (Page::getList() as $page){
-            $code = self::$code;
-            if(($code == $page['code'] || $code == 'index') && $code != 404){
-                return true;
-            }
-        }
-        return false;
     }
 
     /***
