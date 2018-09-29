@@ -104,7 +104,7 @@
             </div>
         <?endif;?>
         <?if(!empty($message['errors'])):?>
-            <div class="alert alert-warning" role="alert" >
+            <div class="alert alert-danger" role="alert" >
                 <?=$message['errors']?>
             </div>
         <?endif;?>
